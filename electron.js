@@ -19,7 +19,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, './HTML/index.html'));
   
   // Open the DevTools.
   if (isElectronDev) { mainWindow.webContents.openDevTools(); }
