@@ -3,7 +3,7 @@
   "productName": "SnakeAI",
   "version": "0.0.01",
   "description": "My Electron application description",
-  "main": "electron.js",
+  "main": "index.js",
   "scripts": {
     "live": "electron .",
     "dist": "electron-builder"

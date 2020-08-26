@@ -17,9 +17,10 @@ const createWindow = () => {
       worldSafeExecuteJavaScript: true
     }
   });
+  console.log(path.join(__dirname, '/src/HTML/index.html'));
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, './HTML/index.html'));
+  mainWindow.loadFile(path.join(__dirname, '/src/HTML/index.html'));
   
   // Open the DevTools.
   if (isElectronDev) { mainWindow.webContents.openDevTools(); }
