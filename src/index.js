@@ -21,12 +21,6 @@ const createWindow = () => {
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
   
-  mainWindow.onbeforeunload = (e) => {
-    console.log("hello");
-    e.preventDefault();
-    e.returnValue = false;
-    return false;
-  }
   // Open the DevTools.
   if (isElectronDev) { mainWindow.webContents.openDevTools(); }
 };
