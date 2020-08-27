@@ -1,7 +1,40 @@
+* {
+  max-height: 100vh;
+}
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
   Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
-  margin: 0;
+  margin: auto;
   padding: 0;
+  min-width: 550px;
+  max-width: 750px; 
+}
+body > div {
+  margin: 0.5em; 
+  padding: 0.25em;
+  background-color: teal; 
+}
+.game-board {
+  flex-direction: column;
+}
+.game-button-div {
+  padding: 0.5em;
+  background-color: darkseagreen;
+}
+.gameDiv {
+  width: 100%;
+  height: 100%;
+  margin: 0.5rem auto;
+  background-color: rgba(100, 149, 237, 0.25);
+}
+.gameDiv > div {
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  background-color: cadetblue;
+}
+.btn {
+  padding: 0.25em;
+  margin: 0 0.5em;
 }
