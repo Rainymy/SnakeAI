@@ -10,7 +10,7 @@ body {
   min-width: 550px;
   max-width: 750px; 
 }
-body > div {
+.wrapper > div {
   margin: 0.5em; 
   padding: 0.25em;
   background-color: teal; 
