@@ -1,3 +1,4 @@
+/* General */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
   Roboto, Helvetica, Arial, sans-serif;
@@ -7,6 +8,12 @@ body {
   min-width: 550px;
   max-width: 750px; 
 }
+.btn {
+  padding: 0.25em;
+  margin: 0 0.5em;
+}
+
+/* wrappers */
 .wrapper > div {
   margin: 0.5em; 
   padding: 0.25em;
@@ -15,6 +22,8 @@ body {
 .game-board {
   flex-direction: column;
 }
+
+/* Board */
 .game-button-div {
   padding: 0.5em;
   background-color: darkseagreen;
@@ -30,8 +39,4 @@ body {
   height: 500px;
   margin: auto;
   background-color: cadetblue;
-}
-.btn {
-  padding: 0.25em;
-  margin: 0 0.5em;
 }
