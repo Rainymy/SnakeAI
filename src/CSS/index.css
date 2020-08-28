@@ -12,6 +12,9 @@ body {
   padding: 0.25em;
   margin: 0 0.5em;
 }
+canvas {
+  background-color: grey;
+}
 
 /* wrappers */
 .wrapper > div {
