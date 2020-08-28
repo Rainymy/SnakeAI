@@ -16,7 +16,7 @@ function propsObject(boxes) {
     }
   }
 }
-let totalRowBoxes = 99;
+let totalRowBoxes = 20;
 let game = new propsObject(totalRowBoxes);
 
 game.drawMap()
