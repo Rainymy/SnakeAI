@@ -15,10 +15,12 @@ function boardProps(boxes) {
     this.ctx.fillStyle = "red";
     this.ctx.fillRect(x, y, this.boxPixel, this.boxPixel);
   }
-  this.character = (x, y) => {
-    this.ctx.beginPath();
-    this.ctx.fillStyle = "red";
-    this.ctx.fillRect(x, y, this.boxPixel, this.boxPixel);
+  this.character = (body) => {
+    for (let i = 0; i < body.length; i++) {
+      this.ctx.beginPath();
+      this.ctx.fillStyle = "red";
+      this.ctx.fillRect(body[i].x, body[i].y, this.boxPixel, this.boxPixel);
+    }
   }
   this.drawSqure = (x, y, size) => {
     this.ctx.beginPath();
@@ -42,6 +44,14 @@ function propObjects(boxSize, totalBoxes) {
     {
       x: this.x, 
       y: this.y 
+    },
+    {
+      x: this.x, 
+      y: this.y
+    },
+    {
+      x: this.x, 
+      y: this.y
     }
   ];
   this.direction = { x: 0, y: 0, letter: null };
@@ -51,6 +61,7 @@ let gameBoard;
 let snakes;
 
 function pressHandler(event) {
+  console.log(event.key);
   if (event.key === "w" && snakes.direction.letter !== "s") {
     return { x: 0, y: -1, letter: "w" };
   }
@@ -69,7 +80,7 @@ function pressHandler(event) {
 const runOnLoad = () => {
   gameBoard = new boardProps(totalRowBoxes);
   snakes = new propObjects(gameBoard.boxPixel, gameBoard.totalBoxes);
-  document.body.addEventListener("keydown", (event) => {
+  document.body.addEventListener("keypress", (event) => {
     snakes.direction = pressHandler(event);
   });
   gameBoard.startGame();
@@ -78,9 +89,17 @@ const runOnLoad = () => {
 function update() {  
   gameBoard.ctx.clearRect(0, 0, gameBoard.canvas.width, gameBoard.canvas.height);
   gameBoard.drawMap();
-  gameBoard.character(snakes.x, snakes.y);
-  snakes.x += snakes.direction.x * gameBoard.boxPixel;
-  snakes.y += snakes.direction.y * gameBoard.boxPixel;
+  gameBoard.character(snakes.body);
+  
+  // for (let i = 0; i < snakes.body.length; i++) {
+  //   snakes.body[i].x += snakes.direction.x * gameBoard.boxPixel;
+  //   snakes.body[i].y += snakes.direction.y * gameBoard.boxPixel;
+  // }
+  snakes.body.unshift({
+    x: snakes.body[0].x + snakes.direction.x * gameBoard.boxPixel,
+    y: snakes.body[0].y + snakes.direction.y * gameBoard.boxPixel
+  });
+  snakes.body.pop();
 }
 window.addEventListener("load", (event) => {
   runOnLoad();
