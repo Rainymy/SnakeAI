@@ -68,6 +68,8 @@ function pressHandler(event) {
   // pressing multiple buttons at the same time
   
   // Remove clickableButton. Doesn't solve the problem
+  // possible solition 
+  // https://www.gavsblog.com/blog/detect-single-and-multiple-keypress-events-javascript
   let clickableButton = (() => {
     if (keypressSequence.length < 3) {
       return true;
