@@ -63,6 +63,11 @@ let keypressSequence = [];
 
 function pressHandler(event) {
   // console.log(keypressSequence);
+  // Bug in this function
+  // Not Registering all buttons while 
+  // pressing multiple buttons at the same time
+  
+  // Remove clickableButton. Doesn't solve the problem
   let clickableButton = (() => {
     if (keypressSequence.length < 3) {
       return true;
@@ -81,8 +86,7 @@ function pressHandler(event) {
     }
     return false;
   })();
-  keypressSequence = keypressSequence.slice(-5);
-  console.log(keypressSequence[keypressSequence.length - 1]);
+  
   if (event.key === "w" && snakes.direction.letter !== "s" && (("w" === clickableButton) || clickableButton)) {
     keypressSequence.push("w");
     snakes.direction = { x: 0, y: -1, letter: "w" };
