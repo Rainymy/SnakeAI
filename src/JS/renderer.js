@@ -59,30 +59,53 @@ function propObjects(boxSize, totalBoxes) {
 let totalRowBoxes = 20;
 let gameBoard;
 let snakes;
+let keypressSequence = [];
 
 function pressHandler(event) {
-  console.log(event.key);
-  if (event.key === "w" && snakes.direction.letter !== "s") {
-    return { x: 0, y: -1, letter: "w" };
+  // console.log(keypressSequence);
+  let clickableButton = (() => {
+    if (keypressSequence.length < 3) {
+      return true;
+    }
+    if (keypressSequence[keypressSequence.length - 1] === "w") {
+      return "s";
+    }
+    else if (keypressSequence[keypressSequence.length - 1] === "s") {
+      return "w";
+    }
+    else if (keypressSequence[keypressSequence.length - 1] === "a") {
+      return "d";
+    }
+    else if (keypressSequence[keypressSequence.length - 1] === "d") {
+      return "a";
+    }
+    return false;
+  })();
+  keypressSequence = keypressSequence.slice(-5);
+  console.log(keypressSequence[keypressSequence.length - 1]);
+  if (event.key === "w" && snakes.direction.letter !== "s" && (("w" === clickableButton) || clickableButton)) {
+    keypressSequence.push("w");
+    snakes.direction = { x: 0, y: -1, letter: "w" };
   }
-  else if (event.key === "s" && snakes.direction.letter !== "w") {
-    return { x: 0, y: 1, letter: "s" };
+  else if (event.key === "s" && snakes.direction.letter !== "w" && (("s" === clickableButton) || clickableButton)) {
+    keypressSequence.push("s");
+    snakes.direction = { x: 0, y: 1, letter: "s" };
   }
-  else if (event.key === "d" && snakes.direction.letter !== "a") {
-    return { x: 1, y: 0, letter: "d" };
+  else if (event.key === "d" && snakes.direction.letter !== "a" && (("d" === clickableButton) || clickableButton)) {
+    keypressSequence.push("d");
+    snakes.direction = { x: 1, y: 0, letter: "d" };
   }
-  else if (event.key === "a" && snakes.direction.letter !== "d") {
-    return { x: -1, y: 0, letter: "a" };
+  else if (event.key === "a" && snakes.direction.letter !== "d" && (("a" === clickableButton) || clickableButton)) {
+    keypressSequence.push("a");
+    snakes.direction = { x: -1, y: 0, letter: "a" };
   }
-  return snakes.direction;
+  snakes.direction = snakes.direction;
 }
 
 const runOnLoad = () => {
   gameBoard = new boardProps(totalRowBoxes);
   snakes = new propObjects(gameBoard.boxPixel, gameBoard.totalBoxes);
-  document.body.addEventListener("keypress", (event) => {
-    snakes.direction = pressHandler(event);
-  });
+  document.body.addEventListener("keypress", pressHandler);
   gameBoard.startGame();
 }
 
