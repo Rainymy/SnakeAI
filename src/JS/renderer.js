@@ -1,11 +1,19 @@
-function propsObject(boxes) {
+function boardProps(boxes) {
   this.canvas = document.getElementById("canvas");
   this.ctx = this.canvas.getContext("2d");
-  this.totalBoxes = boxes || 1;
+  this.totalBoxes = boxes || 10;
   this.boxPixel = this.canvas.width / this.totalBoxes;
+  this.startGame = () => {
+    update();
+  }
+  this.character = (x, y) => {
+    this.ctx.beginPath();
+    this.ctx.fillStyle = "red";
+    this.ctx.fillRect(x, y, this.boxPixel, this.boxPixel);
+  }
   this.drawSqure = (x, y, size) => {
     this.ctx.beginPath();
-    this.ctx.rect(x, y, size, size);
+    this.ctx.rect(x, y, size || this.boxPixel, size || this.boxPixel);
     this.ctx.stroke();
   };
   this.drawMap = () => {
@@ -16,9 +24,28 @@ function propsObject(boxes) {
     }
   }
 }
+
+function propObjects(boxSize, totalBoxes) {
+  this.randomPosition = () => Math.floor(Math.random() * totalBoxes) * boxSize;
+  this.x = this.randomPosition();
+  this.y = this.randomPosition();
+}
 let totalRowBoxes = 20;
-let game = new propsObject(totalRowBoxes);
+let gameBoard;
+let snakes;
 
-game.drawMap()
+const runOnLoad = () => {
+  gameBoard = new boardProps(totalRowBoxes);
+  snakes = new propObjects(gameBoard.boxPixel, gameBoard.totalBoxes);
+  gameBoard.startGame();
+}
 
-console.log(game);
+function update() {  
+  gameBoard.drawMap();
+  gameBoard.character(snakes.x, snakes.y);
+}
+window.addEventListener("load", (event) => {
+  runOnLoad();
+  console.log(gameBoard);
+  console.log(snakes);
+})
