@@ -91,10 +91,6 @@ function update() {
   gameBoard.drawMap();
   gameBoard.character(snakes.body);
   
-  // for (let i = 0; i < snakes.body.length; i++) {
-  //   snakes.body[i].x += snakes.direction.x * gameBoard.boxPixel;
-  //   snakes.body[i].y += snakes.direction.y * gameBoard.boxPixel;
-  // }
   snakes.body.unshift({
     x: snakes.body[0].x + snakes.direction.x * gameBoard.boxPixel,
     y: snakes.body[0].y + snakes.direction.y * gameBoard.boxPixel
