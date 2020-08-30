@@ -31,6 +31,10 @@ canvas {
   padding: 0.5em;
   background-color: darkseagreen;
 }
+.snake-status {
+  display: inline-block;
+  font-weight: bold;
+}
 .gameDiv {
   width: 100%;
   height: 100%;
