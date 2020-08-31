@@ -21,10 +21,6 @@ function boardProps(boxes) {
         ) {
         return true;
       }
-      if (0 > body.x || 0 > body.y) {
-        console.log("crashed");
-        return true;
-      }
       if (i === 0) { continue; }
       if (bodies.length > 1) {
         if (body.x === bodies[0].x  && body.y === bodies[0].y) {
