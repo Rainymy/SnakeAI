@@ -43,7 +43,6 @@ function boardProps(boxes) {
     for (let food of foods) {
       this.drawSolidRect(food.x, food.y, "green");
     }
-    // return { x: x, y: y };
   }
   this.character = (bodies) => {
     for (let body of bodies) {
