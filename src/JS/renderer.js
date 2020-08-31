@@ -52,6 +52,7 @@ function propObjects(boxSize, totalBoxes) {
   this.x = this.getRandomLocation();
   this.y = this.getRandomLocation();
   this.score = 0;
+  this.pressQueue = [];
   this.bodies = [
     {
       x: this.x, 
@@ -76,7 +77,6 @@ let snakes;
 let keypressSequence = [];
 
 function pressHandler(event) {
-  // console.log(keypressSequence);
   // Bug in this function
   // Not Registering all buttons while 
   // pressing multiple buttons at the same time
@@ -96,21 +96,25 @@ function pressHandler(event) {
   if (event.key === "w" && snakes.direction.letter !== "s" 
                         && (("w" === clickableButton) || clickableButton)) {
     keypressSequence.push("w");
+    snakes.pressQueue.push({ x: 0, y: -1, letter: "w" });
     snakes.direction = { x: 0, y: -1, letter: "w" };
   }
   else if (event.key === "s" && snakes.direction.letter !== "w" 
                              && (("s" === clickableButton) || clickableButton)) {
     keypressSequence.push("s");
+    snakes.pressQueue.push({ x: 0, y: 1, letter: "s" });
     snakes.direction = { x: 0, y: 1, letter: "s" };
   }
   else if (event.key === "d" && snakes.direction.letter !== "a" 
                              && (("d" === clickableButton) || clickableButton)) {
     keypressSequence.push("d");
+    snakes.pressQueue.push({ x: 1, y: 0, letter: "d" });
     snakes.direction = { x: 1, y: 0, letter: "d" };
   }
   else if (event.key === "a" && snakes.direction.letter !== "d" 
                              && (("a" === clickableButton) || clickableButton)) {
     keypressSequence.push("a");
+    snakes.pressQueue.push({ x: -1, y: 0, letter: "a" });
     snakes.direction = { x: -1, y: 0, letter: "a" };
   }
 }
@@ -145,9 +149,13 @@ function update() {
   }
   gameBoard.drawFoods( snakes.foods );
   
+  if (snakes.pressQueue.length) {
+    console.log(snakes.pressQueue.shift());
+  };
+  
   snakes.bodies.unshift({
-    x: snakes.bodies[0].x + snakes.direction.x * gameBoard.boxPixel,
-    y: snakes.bodies[0].y + snakes.direction.y * gameBoard.boxPixel
+    x: snakes.bodies[0].x + (undefined || snakes.direction.x) * gameBoard.boxPixel,
+    y: snakes.bodies[0].y + (undefined || snakes.direction.y) * gameBoard.boxPixel
   });
   snakes.bodies.pop();
 }
