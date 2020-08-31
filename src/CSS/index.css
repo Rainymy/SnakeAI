@@ -47,3 +47,6 @@ canvas {
   margin: auto;
   background-color: cadetblue;
 }
+#gameOver {
+  font-weight: bold;
+}

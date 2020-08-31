@@ -13,6 +13,27 @@ function boardProps(boxes) {
   this.endGame = function () {
     clearInterval(this.loopId);
   }
+  this.isGameEnded = function (bodies) {
+    for (let [ i, body ] of bodies.entries()) {
+      if (
+          this.canvas.width  <= body.x || 0 > body.x ||
+          this.canvas.height <= body.y || 0 > body.x
+        ) {
+        return true;
+      }
+      if (0 > body.x || 0 > body.y) {
+        console.log("crashed");
+        return true;
+      }
+      if (i === 0) { continue; }
+      if (bodies.length > 1) {
+        if (body.x === bodies[0].x  && body.y === bodies[0].y) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
   // Entities/Structure
   this.clearScreen = () => {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -71,7 +92,8 @@ function propObjects(boxSize, totalBoxes) {
   ];
   this.direction = { x: 0, y: 0, letter: null };
 }
-let totalRowBoxes = 20;
+// General Decleration
+let totalRowBoxes = 25;
 let gameBoard;
 let snakes;
 
@@ -103,6 +125,10 @@ const runOnLoad = () => {
 function update() {  
   gameBoard.clearScreen();
   gameBoard.character(snakes.bodies);
+  if (gameBoard.isGameEnded(snakes.bodies)) {
+    document.getElementById('gameOver').parentNode.style.display = "inline-block";
+    gameBoard.endGame();
+  }
   
   for (let [ index, food ] of snakes.foods.entries()) {
     if (food.x === snakes.bodies[0].x && food.y === snakes.bodies[0].y) {
@@ -118,6 +144,7 @@ function update() {
     }
   }
   gameBoard.drawFoods( snakes.foods );
+  
   
   if (snakes.pressQueue.length) { snakes.direction = snakes.pressQueue.shift(); }
   
