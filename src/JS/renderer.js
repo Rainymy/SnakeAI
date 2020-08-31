@@ -145,7 +145,6 @@ function update() {
   }
   gameBoard.drawFoods( snakes.foods );
   
-  
   if (snakes.pressQueue.length) { snakes.direction = snakes.pressQueue.shift(); }
   
   snakes.bodies.unshift({
