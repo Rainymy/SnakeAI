@@ -126,8 +126,8 @@ function update() {
   gameBoard.clearScreen();
   gameBoard.character(snakes.bodies);
   if (gameBoard.isGameEnded(snakes.bodies)) {
-    document.getElementById('gameOver').parentNode.style.display = "inline-block";
     gameBoard.endGame();
+    document.getElementById('gameOver').parentNode.style.display = "inline-block";
   }
   
   for (let [ index, food ] of snakes.foods.entries()) {
