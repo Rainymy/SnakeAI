@@ -131,7 +131,6 @@ const runOnLoad = () => {
 
 function update() {  
   gameBoard.clearScreen();
-  gameBoard.drawMap();
   gameBoard.character(snakes.bodies);
   
   for (let [ index, food ] of snakes.foods.entries()) {
@@ -158,6 +157,7 @@ function update() {
     y: snakes.bodies[0].y + (undefined || snakes.direction.y) * gameBoard.boxPixel
   });
   snakes.bodies.pop();
+  gameBoard.drawMap();
 }
 
 window.addEventListener("load", (event) => {
