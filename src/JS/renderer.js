@@ -10,9 +10,7 @@ function boardProps(boxes) {
     this.drawMap();
     this.loopId = setInterval(update, 120);
   }
-  this.endGame = function () {
-    clearInterval(this.loopId);
-  }
+  this.endGame = function () { clearInterval(this.loopId); }
   this.isGameEnded = function (bodies) {
     for (let [ i, body ] of bodies.entries()) {
       if (
