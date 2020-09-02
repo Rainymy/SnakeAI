@@ -15,7 +15,7 @@ function boardProps(boxes) {
     for (let [ i, body ] of bodies.entries()) {
       if (
           this.canvas.width  <= body.x || 0 > body.x ||
-          this.canvas.height <= body.y || 0 > body.x
+          this.canvas.height <= body.y || 0 > body.y
         ) {
         return true;
       }
