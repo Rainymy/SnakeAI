@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'"> -->
     <title>SnakeAI</title>
-    <link rel="stylesheet" href="./src/CSS/index.css">
+    <script src="https:\/\/unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script>
+    <link rel="stylesheet" href="./src/index.css">
   </head>
   <body>
     <div class="wrapper">
@@ -34,5 +35,10 @@
       </div>
     </div>
   </body>
-  <script src="./src/JS/renderer.js" charset="utf-8"></script>
+  <script type="text/javascript">
+    console.log(ml5);
+  </script>
+  <script defer src="./src/objects/boardObject.js"></script>
+  <script defer src="./src/objects/snakeObject.js"></script>
+  <script defer src="./src/renderer.js"></script>
 </html>
