@@ -3,15 +3,12 @@ function snakeObjects(boxSize, totalBoxes) {
     return Math.floor(Math.random() * totalBoxes) * boxSize;
   }
   this.getRandomAvailableLocation = function () {
-    if (!this.isMapAvaible()) {
-      console.log("isMapAvaible not avaible");
-      this.wholeMap = this.getFullMap();
-    }
+    if (!this.isMapAvaible()) { this.wholeMap = this.getFullMap(); }
     let avaible = this.wholeMap.filter((item, i) => {
       for (let body of this.bodies) {
-        if (body.x !== item.x && body.y !== item.y) {
-          return item;
-        }
+        if (body.x !== item.x) { return true; } 
+        else if (body.y !== item.y) { return true; } 
+        else if (body.x !== item.x && body.y !== item.y) { return false; }
       }
     });
     return avaible[Math.floor(Math.random() * avaible.length)];
@@ -19,7 +16,7 @@ function snakeObjects(boxSize, totalBoxes) {
   this.x = this.getRandomLocation();
   this.y = this.getRandomLocation();
   this.isMapAvaible = function () {
-    if (this.wholeMap.length <= 0 || !this.wholeMap) {
+    if (this.wholeMap.length <= 0 || !Array.isArray(this.wholeMap)) {
       return false;
     }
     return true;
@@ -33,8 +30,9 @@ function snakeObjects(boxSize, totalBoxes) {
     }
     return wholeMap;
   }
-  this.spawnFood = function (total=2) {
-    for (let i = 0; i < total; i++) {
+  this.spawnFood = function (t) {
+    t |= 2; 
+    for (let i = 0; i < t; i++) {
       let location = this.getRandomAvailableLocation();
       this.foods.push({
         x: location.x,
