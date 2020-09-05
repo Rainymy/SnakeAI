@@ -33,15 +33,14 @@ function update() {
         y: snakes.bodies[0].y
       });
       let newFood = snakes.getRandomAvailableLocation();
+      console.log(newFood);
       snakes.foods.splice(index, 1, {
-        x: newFood.x ,//snakes.getRandomLocation(),
-        y: newFood.y //snakes.getRandomLocation()
+        x: newFood.x,
+        y: newFood.y
       });
-      console.count();
     }
   }
   gameBoard.drawFoods( snakes.foods );
-  snakes.getRandomAvailableLocation();
   
   if (snakes.pressQueue.length) { snakes.direction = snakes.pressQueue.shift(); }
   
@@ -56,6 +55,7 @@ function update() {
 const runOnLoad = () => {
   gameBoard = new boardProps(totalRowBoxes);
   snakes = new snakeObjects(gameBoard.boxPixel, gameBoard.totalBoxes);
+  snakes.spawnFood();
   document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") { gameBoard.endGame(); }
