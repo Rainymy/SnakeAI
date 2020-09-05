@@ -15,6 +15,7 @@ function pressHandler(event) {
   else if (event.key === "a" && snakes.direction.letter !== "d") {
     snakes.pressQueue.push({ x: -1, y: 0, letter: "a" });
   }
+  return null;
 }
 
 function update() {  
@@ -33,7 +34,6 @@ function update() {
         y: snakes.bodies[0].y
       });
       let newFood = snakes.getRandomAvailableLocation();
-      console.log(newFood);
       snakes.foods.splice(index, 1, {
         x: newFood.x,
         y: newFood.y
@@ -58,7 +58,10 @@ const runOnLoad = () => {
   snakes.spawnFood();
   document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
-    if (event.key === "Escape") { gameBoard.endGame(); }
+    if (event.key === "Escape") {
+      gameBoard.endGame();
+      return null;
+    }
   });
   gameBoard.startGame();
 }
