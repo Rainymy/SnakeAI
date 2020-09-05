@@ -5,8 +5,8 @@ body {
   box-sizing: border-box;
   margin: auto;
   padding: 0;
-  min-width: 550px;
-  max-width: 750px;
+  min-width: 1010px;
+  /* max-width: 750px; */
 }
 .btn {
   padding: 0.25em;
@@ -42,8 +42,8 @@ canvas {
   background-color: rgba(100, 149, 237, 0.25);
 }
 .gameDiv > div {
-  width: 500px;
-  height: 500px;
+  width: 1010px;
+  /* height: 500px; */
   margin: auto;
   background-color: cadetblue;
 }

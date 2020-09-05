@@ -1,61 +1,83 @@
 function boardProps(boxes) {
   // Genenal
-  this.canvas = document.getElementById("canvas");
-  this.ctx = this.canvas.getContext("2d");
+  this.canvas = document.getElementsByTagName('canvas');
+  this.ctx = (() => {
+    let ctx = [];
+    for (let context of this.canvas) { ctx.push(context.getContext('2d')); }
+    return ctx;
+  })();
   this.totalBoxes = Math.floor(boxes) || 10;
-  this.boxPixel = Math.round(this.canvas.width / this.totalBoxes);
+  this.boxPixel = Math.round(this.canvas[0].width / this.totalBoxes);
   // Game logices
-  this.loopId = null;
+  this.loopId = [];
   this.startGame = function () {
-    this.drawMap();
-    this.loopId = setInterval(update, 120);
+    // this.drawMap();
+    (() => {
+      for(let i = 0; i < this.canvas.length; i++) {
+        this.loopId.push(setInterval(() => {
+          update(i);
+        }, 120));
+      }
+    })();
   }
-  this.endGame = function () { clearInterval(this.loopId); }
-  this.isGameEnded = function (bodies) {
+  this.endGame = function (index) {
+    clearInterval(index);
+  }
+  this.isGameEnded = function (bodies, index) {
     for (let [ i, body ] of bodies.entries()) {
       if (
-          this.canvas.width  <= body.x || 0 > body.x ||
-          this.canvas.height <= body.y || 0 > body.y
+          this.canvas[index].width  <= body.x || 0 > body.x ||
+          this.canvas[index].height <= body.y || 0 > body.y
         ) {
         return true;
       }
       if (i === 0) { continue; }
-      if (bodies.length >= 2) {
-        if (body.x === bodies[0].x  && body.y === bodies[0].y) {
-          return true;
-        }
+      if (bodies.length >= 2 && body.x === bodies[0].x  && body.y === bodies[0].y) {
+        return true;
       }
     }
     return false;
   }
   // Entities/Structure
-  this.clearScreen = () => {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.clearScreen = (index) => {
+    let context = this.canvas[index];
+    context.getContext('2d').clearRect(0, 0, context.width, context.height);
   }
-  this.drawSolidRect = (x, y, colour) => {
-    this.ctx.beginPath();
-    this.ctx.fillStyle = colour || "black";
-    this.ctx.fillRect(x, y, this.boxPixel, this.boxPixel);
+  this.moveSnake = function (obj) {
+    obj.bodies.unshift({
+      x: obj.bodies[0].x + obj.direction.x * this.boxPixel,
+      y: obj.bodies[0].y + obj.direction.y * this.boxPixel
+    });
+    obj.bodies.pop();
   }
-  this.drawFoods = (foods) => {
+  this.drawSolidRect = (x, y, colour, index) => {
+    this.ctx[index].beginPath();
+    this.ctx[index].fillStyle = colour || "black";
+    this.ctx[index].fillRect(x, y, this.boxPixel, this.boxPixel);
+  }
+  this.drawFoods = (foods, index) => {
     for (let food of foods) {
-      this.drawSolidRect(food.x, food.y, "green");
+      this.drawSolidRect(food.x, food.y, "green", index);
     }
   }
-  this.character = (bodies) => {
+  this.character = (bodies, index) => {
     for (let body of bodies) {
-      this.drawSolidRect(body.x, body.y, "red");
+      this.drawSolidRect(body.x, body.y, "red", index);
     }
   }
   this.drawSqure = (x, y, size) => {
-    this.ctx.beginPath();
-    this.ctx.rect(x, y, size || this.boxPixel, size || this.boxPixel);
-    this.ctx.stroke();
+    for (let context of this.ctx) {
+      context.beginPath();
+      context.rect(x, y, size || this.boxPixel, size || this.boxPixel);
+      context.stroke();
+    }
   };
-  this.drawMap = () => {
-    for (let i = 0; i < this.canvas.width/this.boxPixel; i++) {
-      for (let j = 0; j < this.canvas.height/this.boxPixel; j++) {
-        this.drawSqure(i * this.boxPixel, j * this.boxPixel, this.boxPixel);
+  this.drawMap = (index) => {
+    for (let canvas of this.canvas) {
+      for (let i = 0; i < this.canvas[index].width/this.boxPixel; i++) {
+        for (let j = 0; j < this.canvas[index].height/this.boxPixel; j++) {
+          this.drawSqure(i * this.boxPixel, j * this.boxPixel, this.boxPixel);
+        }
       }
     }
   }
