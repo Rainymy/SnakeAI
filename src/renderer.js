@@ -50,6 +50,7 @@ function update() {
   });
   snakes.bodies.pop();
   gameBoard.drawMap();
+  pressHandler(makePrediction());
 }
   
 const runOnLoad = () => {
