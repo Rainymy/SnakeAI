@@ -30,9 +30,8 @@ function snakeObjects(boxSize, totalBoxes) {
     }
     return wholeMap;
   }
-  this.spawnFood = function (t) {
-    t |= 2; 
-    for (let i = 0; i < t; i++) {
+  this.spawnFood = function (total = 2) {
+    for (let i = 0; i < total; i++) {
       let location = this.getRandomAvailableLocation();
       this.foods.push({
         x: location.x,
