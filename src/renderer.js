@@ -3,8 +3,8 @@ let gameBoard;
 let snakes = [];
 let currentSnake = null;
 
-function pressHandler(event, index) {
-  let obj = snakes[index];
+function pressHandler(event, loopObj) {
+  let obj = snakes[loopObj.index];
   if (event.key === "w" && obj.direction.letter !== "s") {
     obj.pressQueue.push({ x: 0, y: -1, letter: "w" });
   }
@@ -21,13 +21,14 @@ function pressHandler(event, index) {
 }
 
 function update(loopIndex) {
-  console.count();
-  currentSnake = snakes[loopIndex];
+  currentSnake = snakes[loopIndex.index];
+  currentSnake.frames++;
+  console.log("Snake: " + "%c" + currentSnake.frames, `color: ${currentSnake.color}`);
   gameBoard.clearScreen(loopIndex);
   gameBoard.character(currentSnake.bodies, loopIndex);
   
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
-    gameBoard.endGame(loopIndex + 1);
+    gameBoard.endGame(loopIndex);
     document.getElementById('gameOver').parentNode.style.display = "inline-block";
   }
   for (let [ index, food ] of currentSnake.foods.entries()) {
@@ -70,7 +71,9 @@ const runOnLoad = () => {
   // document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
-      for (let loop of gameBoard.loopId) { gameBoard.endGame(loop); }
+      for (let loop of gameBoard.loopIds) {
+        gameBoard.endGame(loop);
+      }
       return null;
     }
   });

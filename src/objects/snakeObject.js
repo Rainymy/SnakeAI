@@ -13,6 +13,9 @@ function snakeObjects(boxSize, totalBoxes) {
     });
     return avaible[Math.floor(Math.random() * avaible.length)];
   }
+  this.generateRandomColor = function() {
+    return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+  }
   this.x = this.getRandomLocation();
   this.y = this.getRandomLocation();
   this.isMapAvaible = function () {
@@ -41,6 +44,8 @@ function snakeObjects(boxSize, totalBoxes) {
   }
   this.wholeMap = [];
   this.score = 0;
+  this.frames = 0;
+  this.color = this.generateRandomColor();
   this.pressQueue = [];
   this.bodies = [
     {

@@ -9,25 +9,26 @@ function boardProps(boxes) {
   this.totalBoxes = Math.floor(boxes) || 10;
   this.boxPixel = Math.round(this.canvas[0].width / this.totalBoxes);
   // Game logices
-  this.loopId = [];
+  this.loopIds = [];
   this.startGame = function () {
-    // this.drawMap();
-    (() => {
-      for(let i = 0; i < this.canvas.length; i++) {
-        this.loopId.push(setInterval(() => {
-          update(i);
-        }, 120));
-      }
-    })();
+    for(let i = 0; i < this.canvas.length; i++) {
+      this.loopIds.push({
+        intervalId: setInterval(() => this.switcher(i), 120),
+        index: i
+      });
+    }
   }
-  this.endGame = function (index) {
-    clearInterval(index);
+  this.switcher = (index) => {
+    update(this.loopIds[index]);
   }
-  this.isGameEnded = function (bodies, index) {
+  this.endGame = function (loopObj) {
+    clearInterval(loopObj.intervalId);
+  }
+  this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {
       if (
-          this.canvas[index].width  <= body.x || 0 > body.x ||
-          this.canvas[index].height <= body.y || 0 > body.y
+          this.canvas[loopObj.index].width  <= body.x || 0 > body.x ||
+          this.canvas[loopObj.index].height <= body.y || 0 > body.y
         ) {
         return true;
       }
@@ -39,8 +40,8 @@ function boardProps(boxes) {
     return false;
   }
   // Entities/Structure
-  this.clearScreen = (index) => {
-    let context = this.canvas[index];
+  this.clearScreen = (loopObj) => {
+    let context = this.canvas[loopObj.index];
     context.getContext('2d').clearRect(0, 0, context.width, context.height);
   }
   this.moveSnake = function (obj) {
@@ -55,14 +56,14 @@ function boardProps(boxes) {
     this.ctx[index].fillStyle = colour || "black";
     this.ctx[index].fillRect(x, y, this.boxPixel, this.boxPixel);
   }
-  this.drawFoods = (foods, index) => {
+  this.drawFoods = (foods, loopObj) => {
     for (let food of foods) {
-      this.drawSolidRect(food.x, food.y, "green", index);
+      this.drawSolidRect(food.x, food.y, "green", loopObj.index);
     }
   }
-  this.character = (bodies, index) => {
+  this.character = (bodies, loopObj) => {
     for (let body of bodies) {
-      this.drawSolidRect(body.x, body.y, "red", index);
+      this.drawSolidRect(body.x, body.y, "red", loopObj.index);
     }
   }
   this.drawSqure = (x, y, size) => {
@@ -72,10 +73,10 @@ function boardProps(boxes) {
       context.stroke();
     }
   };
-  this.drawMap = (index) => {
+  this.drawMap = (loopObj) => {
     for (let canvas of this.canvas) {
-      for (let i = 0; i < this.canvas[index].width/this.boxPixel; i++) {
-        for (let j = 0; j < this.canvas[index].height/this.boxPixel; j++) {
+      for (let i = 0; i < this.canvas[loopObj.index].width/this.boxPixel; i++) {
+        for (let j = 0; j < this.canvas[loopObj.index].height/this.boxPixel; j++) {
           this.drawSqure(i * this.boxPixel, j * this.boxPixel, this.boxPixel);
         }
       }
