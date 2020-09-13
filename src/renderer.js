@@ -23,7 +23,7 @@ function pressHandler(event, loopObj) {
 function update(loopIndex) {
   currentSnake = snakes[loopIndex.index];
   currentSnake.frames++;
-  console.log("Snake: " + "%c" + currentSnake.frames, `color: ${currentSnake.color}`);
+  console.log(`Snake: %c${currentSnake.frames}`, `color: ${currentSnake.color}`);
   gameBoard.clearScreen(loopIndex);
   gameBoard.character(currentSnake.bodies, loopIndex);
   
