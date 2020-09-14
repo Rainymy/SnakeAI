@@ -57,7 +57,7 @@ function update(loopIndex) {
   // if (loopIndex !== 0) { pressHandler(makePrediction(), loopIndex); } 
   pressHandler(makePrediction(), loopIndex);
 }
-  
+
 const runOnLoad = () => {
   gameBoard = new boardProps(totalRowBoxes);
   snakes = (() => {
@@ -78,9 +78,25 @@ const runOnLoad = () => {
     }
   });
   gameBoard.startGame();
+  console.log(gameBoard);
+}
+
+function init() {
+  if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 5); };
+  let x = document.querySelector('[class="gameDiv"] > div');
+  let canvas = null;
+  for (let i = 0; i < localStorage.totalCanvas; i++) {
+    canvas = document.createElement("canvas");
+    canvas.id = "canvas";
+    canvas.width = 500;
+    canvas.height = 500;
+    // x.appendChild(document.createElement("div"))
+    x.appendChild(canvas);
+  }
+  console.log(localStorage);
 }
 
 window.addEventListener("load", (event) => {
+  init();
   runOnLoad();
-  console.log(gameBoard);
 });

@@ -17,22 +17,45 @@
           </div>
           <button class="btn" >buttons</button>
           <button class="btn" >buttons</button>
-          <button class="btn" >buttons</button>
+          <button class="btn" >
+            <b>Clear localStorage</b>
+            <script defer type="text/javascript">
+              document.currentScript.parentNode.onclick = (event) => {
+                localStorage.clear();
+              }
+            </script>
+          </button>
+          <div style="display: inline-block">
+            <input type="search">
+            <button class="btn">
+              <b>Change</b>
+              <script type="text/javascript">
+                let selected = document.currentScript.parentNode;
+                selected.onclick = (event) => {
+                  let number = parseInt(selected.previousElementSibling.value);
+                  let val = Number.isNaN(number);
+                  if (val !== true) {
+                    localStorage.setItem("totalCanvas", number);
+                    location.reload();
+                  }
+                }
+              </script>
+            </button>
+          </div>
           <div class="" style="display: none">
             <span id="gameOver">Game Over</span>
           </div>
         </div>
         <div class="gameDiv">
           <div class="">
-            <canvas id="canvas" width="500" height="500"></canvas>
-            <canvas id="canvas" width="500" height="500"></canvas>
+            <!-- Canvas dynamically adds in -->
           </div>
         </div>
-      </div>
-      <div class="bottom">
-        <button class="btn" >Random</button>
-        <button class="btn" >load</button>
-        <button class="btn" >save</button>
+        <div class="bottom">
+          <button class="btn" >Random</button>
+          <button class="btn" >load</button>
+          <button class="btn" >save</button>
+        </div>
       </div>
     </div>
   </body>
