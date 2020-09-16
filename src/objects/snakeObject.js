@@ -13,7 +13,7 @@ function snakeObjects(boxSize, totalBoxes) {
     });
     return avaible[Math.floor(Math.random() * avaible.length)];
   }
-  this.generateRandomColor = function() {
+  this.generateRandomColor = function () {
     return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
   }
   this.x = this.getRandomLocation();
@@ -50,7 +50,13 @@ function snakeObjects(boxSize, totalBoxes) {
   this.bodies = [
     {
       x: this.x, 
-      y: this.y
+      y: this.y,
+      invisible: false
+    },
+    {
+      x: this.x, 
+      y: this.y,
+      invisible: true
     }
   ];
   this.foods = [];
