@@ -29,7 +29,7 @@ function update(loopIndex) {
   
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
     gameBoard.endGame(loopIndex);
-    document.getElementById('gameOver').parentNode.style.display = "inline-block";
+    // document.getElementById('gameOver').parentNode.style.display = "inline-block";
   }
   for (let [ index, food ] of currentSnake.foods.entries()) {
     if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
@@ -90,7 +90,6 @@ function init() {
     canvas.id = "canvas";
     canvas.width = 500;
     canvas.height = 500;
-    // x.appendChild(document.createElement("div"))
     x.appendChild(canvas);
   }
   console.log(localStorage);
