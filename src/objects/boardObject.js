@@ -13,16 +13,17 @@ function boardProps(boxes) {
   this.startGame = function () {
     for(let i = 0; i < this.canvas.length; i++) {
       this.loopIds.push({
-        intervalId: setInterval(() => this.switcher(i), 120),
+        intervalId: setInterval(() => this.runAgain(i), 120),
         index: i
       });
     }
   }
-  this.switcher = (index) => {
+  this.runAgain = (index) => {
     update(this.loopIds[index]);
   }
   this.endGame = function (loopObj) {
     clearInterval(loopObj.intervalId);
+    window.cancelAnimationFrame(loopObj.intervalId);
   }
   this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {
