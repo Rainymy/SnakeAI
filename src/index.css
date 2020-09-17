@@ -65,6 +65,7 @@ canvas {
   grid-auto-rows: 500px;
   
   justify-content: center;
+  padding: 25px 0;
   background-color: cadetblue;
 }
 #gameOver {
