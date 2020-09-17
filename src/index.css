@@ -20,6 +20,13 @@ canvas {
   background-color: grey;
   margin: auto;
 }
+.score {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translate(100%, -50%);
+  font-weight: bold;
+}
 
 /* wrappers */
 .wrapper {
@@ -44,7 +51,6 @@ canvas {
 .bottom {
   background-color: darkseagreen;
   padding: 0.5em;
-  width: 100%;
 }
 .snake-status {
   display: inline-block;

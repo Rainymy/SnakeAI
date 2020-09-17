@@ -1,4 +1,4 @@
-function snakeObjects(boxSize, totalBoxes) {
+function snakeObjects(boxSize, totalBoxes, canvas) {
   this.getRandomLocation = function () {
     return Math.floor(Math.random() * totalBoxes) * boxSize;
   }
@@ -45,6 +45,7 @@ function snakeObjects(boxSize, totalBoxes) {
   this.wholeMap = [];
   this.score = 0;
   this.frames = 0;
+  this.canvas = canvas;
   this.color = this.generateRandomColor();
   this.pressQueue = [];
   this.bodies = [

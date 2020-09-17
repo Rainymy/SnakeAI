@@ -20,21 +20,23 @@ function pressHandler(event, loopObj={ index: 0 }) {
   return null;
 }
 
-async function update(loopIndex) {
+function update(loopIndex) {
   currentSnake = snakes[loopIndex.index];
   currentSnake.frames++;
   console.log(`Snake: %c${currentSnake.frames}`, `color: ${currentSnake.color}`);
-  
   // gameBoard.clearScreen(loopIndex);
   // gameBoard.drawMap(loopIndex);
   
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
     gameBoard.endGame(loopIndex);
-    // document.getElementById('gameOver').parentNode.style.display = "inline-block";
+    currentSnake.canvas.parentNode.querySelector(".score").innerHTML += "<br>Game Over";
   }
   for (let [ index, food ] of currentSnake.foods.entries()) {
     if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
-      document.getElementById("score").textContent = currentSnake.score += 1; 
+      
+      currentSnake.canvas
+          .parentNode.querySelector(".score")
+          .textContent = "Score: " + ++currentSnake.score; 
       currentSnake.bodies.unshift({
         x: currentSnake.bodies[0].x,
         y: currentSnake.bodies[0].y,
@@ -67,7 +69,9 @@ const runOnLoad = () => {
   snakes = (() => {
     let players = [];
     for (let i = 0; i < gameBoard.canvas.length; i++) {
-      players.push(new snakeObjects(gameBoard.boxPixel, gameBoard.totalBoxes));
+      players.push(
+        new snakeObjects(gameBoard.boxPixel, gameBoard.totalBoxes, gameBoard.canvas[i])
+      );
       gameBoard.drawMap({ index: i });
     }
     return players;
@@ -85,17 +89,30 @@ const runOnLoad = () => {
   gameBoard.startGame();
   console.log(gameBoard);
 }
+function applyCSSToElement(elem, css) {
+  console.log(elem);
+  console.log(css);
+}
 
 function init() {
   if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 5); };
   let parentElem = document.querySelector('[class="gameDiv"] > div');
   let canvas = null;
+  let div = null;
+  let text = null;
   for (let i = 0; i < localStorage.totalCanvas; i++) {
+    div = document.createElement("div");
+    div.style.position = "relative";
     canvas = document.createElement("canvas");
+    text = document.createElement("span");
+    text.textContent  = "Score: 0";
+    text.classList.add("score");
+    div.appendChild(text);
     canvas.id = "canvas";
     canvas.width = 500;
     canvas.height = 500;
-    parentElem.appendChild(canvas);
+    div.appendChild(canvas);
+    parentElem.appendChild(div);
   }
   console.log(localStorage);
   runOnLoad();
