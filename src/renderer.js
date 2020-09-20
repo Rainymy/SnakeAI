@@ -29,7 +29,7 @@ function update(loopIndex) {
   
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
     gameBoard.endGame(loopIndex);
-    currentSnake.canvas.parentNode.querySelector(".score").innerHTML += "<br>Game Over";
+    currentSnake.canvas.parentNode.querySelector(".score").textContent += " - Game Over";
   }
   for (let [ index, food ] of currentSnake.foods.entries()) {
     if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
@@ -89,13 +89,15 @@ const runOnLoad = () => {
   gameBoard.startGame();
   console.log(gameBoard);
 }
-function applyCSSToElement(elem, css) {
-  console.log(elem);
-  console.log(css);
+function createCanvas(id, width, height) {
+  canvas = document.createElement("canvas");
+  canvas.id = id;
+  canvas.width = 500;
+  canvas.height = 500;
 }
 
 function init() {
-  if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 5); };
+  if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 4); };
   let parentElem = document.querySelector('[class="gameDiv"] > div');
   let canvas = null;
   let div = null;
@@ -103,11 +105,11 @@ function init() {
   for (let i = 0; i < localStorage.totalCanvas; i++) {
     div = document.createElement("div");
     div.style.position = "relative";
-    canvas = document.createElement("canvas");
     text = document.createElement("span");
     text.textContent  = "Score: 0";
     text.classList.add("score");
     div.appendChild(text);
+    canvas = document.createElement("canvas");
     canvas.id = "canvas";
     canvas.width = 500;
     canvas.height = 500;
