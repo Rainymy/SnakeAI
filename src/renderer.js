@@ -80,7 +80,7 @@ function eventHandlers() {
 
 const runOnLoad = () => {
   gameBoard = new boardProps(totalRowBoxes);
-  snakes = manager.populate(4, snakeObjects, gameBoard);
+  snakes = manager.populate(gameBoard.canvas.length, snakeObjects, gameBoard);
   for (let snake of snakes) { snake.spawnFood(); }
   
   gameBoard.startGame();
