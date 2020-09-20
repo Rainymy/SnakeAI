@@ -10,19 +10,23 @@ function boardProps(boxes) {
   this.boxPixel = Math.round(this.canvas[0].width / this.totalBoxes);
   // Game logices
   this.loopIds = [];
+  this.totalLeft = 0;
   this.startGame = function () {
-    for(let i = 0; i < this.canvas.length; i++) {
+    for (let loop of this.loopIds) { clearInterval(loop.intervalId); }
+    for (let i = 0; i < this.canvas.length; i++) {
       this.loopIds.push({
         intervalId: setInterval(() => this.runAgain(i), 120),
         index: i
       });
     }
+    this.totalLeft = this.canvas.length;
   }
   this.runAgain = (index) => {
     update(this.loopIds[index]);
   }
   this.endGame = function (loopObj) {
     clearInterval(loopObj.intervalId);
+    this.totalLeft--;
   }
   this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {

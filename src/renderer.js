@@ -1,6 +1,7 @@
 let totalRowBoxes = 25;
 let gameBoard;
 let snakes = [];
+let manager = null;
 let currentSnake = null;
 
 function pressHandler(event, loopObj={ index: 0 }) {
@@ -29,14 +30,15 @@ function update(loopIndex) {
   
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
     gameBoard.endGame(loopIndex);
-    currentSnake.canvas.parentNode.querySelector(".score").textContent += " - Game Over";
+    // currentSnake.canvas.parentNode.querySelector(".score").textContent += " - Game Over";
+    currentSnake.canvas.parentNode.querySelector("#gameEnded").style.display = "";
   }
   for (let [ index, food ] of currentSnake.foods.entries()) {
     if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
-      
       currentSnake.canvas
-          .parentNode.querySelector(".score")
+          .parentNode.querySelector(".score").childNodes[0]
           .textContent = "Score: " + ++currentSnake.score; 
+          
       currentSnake.bodies.unshift({
         x: currentSnake.bodies[0].x,
         y: currentSnake.bodies[0].y,
@@ -64,58 +66,32 @@ function update(loopIndex) {
   pressHandler(makePrediction(), loopIndex);
 }
 
-const runOnLoad = () => {
-  gameBoard = new boardProps(totalRowBoxes);
-  snakes = (() => {
-    let players = [];
-    for (let i = 0; i < gameBoard.canvas.length; i++) {
-      players.push(
-        new snakeObjects(gameBoard.boxPixel, gameBoard.totalBoxes, gameBoard.canvas[i])
-      );
-      gameBoard.drawMap({ index: i });
-    }
-    return players;
-  })();
-  for (let snake of snakes) { snake.spawnFood(); }
+function eventHandlers() {
   document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
-      for (let loop of gameBoard.loopIds) {
-        gameBoard.endGame(loop);
-      }
-      return null;
+      for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
     }
   });
-  gameBoard.startGame();
-  console.log(gameBoard);
+  document.querySelector("#trying").addEventListener("click", () => {
+    manager.restart(snakes, snakeObjects, gameBoard);
+  });
 }
-function createCanvas(id, width, height) {
-  canvas = document.createElement("canvas");
-  canvas.id = id;
-  canvas.width = 500;
-  canvas.height = 500;
+
+const runOnLoad = () => {
+  gameBoard = new boardProps(totalRowBoxes);
+  snakes = manager.populate(4, snakeObjects, gameBoard);
+  for (let snake of snakes) { snake.spawnFood(); }
+  
+  gameBoard.startGame();
 }
 
 function init() {
   if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 4); };
   let parentElem = document.querySelector('[class="gameDiv"] > div');
-  let canvas = null;
-  let div = null;
-  let text = null;
-  for (let i = 0; i < localStorage.totalCanvas; i++) {
-    div = document.createElement("div");
-    div.style.position = "relative";
-    text = document.createElement("span");
-    text.textContent  = "Score: 0";
-    text.classList.add("score");
-    div.appendChild(text);
-    canvas = document.createElement("canvas");
-    canvas.id = "canvas";
-    canvas.width = 500;
-    canvas.height = 500;
-    div.appendChild(canvas);
-    parentElem.appendChild(div);
-  }
+  manager = new boardManager();
+  manager.createGameGround(parentElem, localStorage.totalCanvas);
+  eventHandlers();
   console.log(localStorage);
   runOnLoad();
 }
