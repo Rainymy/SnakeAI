@@ -23,7 +23,6 @@ function boardProps(boxes) {
   }
   this.endGame = function (loopObj) {
     clearInterval(loopObj.intervalId);
-    window.cancelAnimationFrame(loopObj.intervalId);
   }
   this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {
