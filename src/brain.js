@@ -1,4 +1,8 @@
-const moves = [ "w", "a", "s", "d" ];
+const buttons = [ "w", "a", "s", "d" ];
 function makePrediction() {
-  return { key: moves[Math.floor(Math.random() * moves.length)] };
+  let moves = [];
+  for (let i = 0; i < 2; i++) {
+    moves.push({ key: buttons[Math.floor(Math.random() * buttons.length)] });
+  }
+  return moves;
 }

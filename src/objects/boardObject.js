@@ -15,7 +15,7 @@ function boardProps(boxes) {
     for (let loop of this.loopIds) { clearInterval(loop.intervalId); }
     for (let i = 0; i < this.canvas.length; i++) {
       this.loopIds.push({
-        intervalId: setInterval(() => this.runAgain(i), 120),
+        intervalId: setInterval(this.runAgain, 120, i),
         index: i
       });
     }
@@ -38,9 +38,7 @@ function boardProps(boxes) {
         return true;
       }
       // if body has invisbale property
-      if (i === 0 || body.invisible) {
-        continue; 
-      }
+      if (i === 0 || body.invisible) { continue; }
       // if head crashed with body part
       if (bodies.length >= 3 && body.x === bodies[0].x  && body.y === bodies[0].y) {
         return true;
@@ -66,10 +64,9 @@ function boardProps(boxes) {
     });
     let last = body.pop();
     body[body.length - 1].invisible = true;
-    if (obj.direction.x === 0 && obj.direction.y === 0) {
-      return [{ x: -this.boxPixel, y: -this.boxPixel }]
-    }
-    return [last];
+    
+    return obj.direction.x === 0 && obj.direction.y === 0 
+              ? [{ x: -this.boxPixel, y: -this.boxPixel }] : [last]
   }
   this.drawSolidRect = (x, y, index, colour) => {
     let context = this.ctx[index];
@@ -83,10 +80,7 @@ function boardProps(boxes) {
     }
   }
   this.character = (bodies, loopObj) => {
-    for (let [index, body] of bodies.entries()) {
-      if (body.invisible) { continue; }
-      this.drawSolidRect(body.x, body.y, loopObj.index, "red");
-    }
+    this.drawSolidRect(bodies[0].x, bodies[0].y, loopObj.index, "red");
   }
   this.drawSqure = (x, y, index) => {
     let context = this.ctx[index];
@@ -105,10 +99,9 @@ function boardProps(boxes) {
   }
   this.drawMapPart = (parts, loopObj) => {
     for (let [index, part] of parts.entries()) {
-      if (part === undefined) { break; }
       this.clearPixel(part.x, part.y, loopObj);
       this.drawSqure(part.x ,part.y, loopObj.index);
-      parts.splice(index, 1);
+      // parts.splice(index, 1);
     }
   }
 }

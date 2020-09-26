@@ -33,8 +33,7 @@
                 let selected = document.currentScript.parentNode;
                 selected.onclick = (event) => {
                   let number = parseInt(selected.previousElementSibling.value);
-                  let val = Number.isNaN(number);
-                  if (val !== true) {
+                  if (Number.isNaN(number) !== true) {
                     localStorage.setItem("totalCanvas", number);
                     location.reload();
                   }
@@ -61,8 +60,8 @@
   </body>
   <!-- <script type="text/javascript"> console.log(ml5); </script> -->
   <script defer src="./src/brain.js" charset="utf-8"></script>
-  <script defer src="./src/objects/boardManager.js"></script>
-  <script defer src="./src/objects/boardObject.js"></script>
-  <script defer src="./src/objects/snakeObject.js"></script>
-  <script defer src="./src/renderer.js"></script>
+  <script defer src="./src/objects/boardManager.js" charset="utf-8"></script>
+  <script defer src="./src/objects/boardObject.js" charset="utf-8"></script>
+  <script defer src="./src/objects/snakeObject.js" charset="utf-8"></script>
+  <script defer src="./src/renderer.js" charset="utf-8"></script>
 </html>

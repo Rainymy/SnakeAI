@@ -1,14 +1,33 @@
 function boardManager() {
+  this.gameBoard = null;
+  this.wholeMap = null;
   this.boardIds = [];
-  this.wholeMap = [];
+  /*-------------------- General ----------------------*/
   this.createUniqueId = function () {
     return Math.random().toString(36).substring(2);
   }
+  this.populate = function (quantity, snakeObj, board) {
+    let players = [];
+    for (let i = 0; i < quantity; i++) {
+      players.push(new snakeObj(board.boxPixel, board.totalBoxes, board.canvas[i]));
+      board.clearScreen({ index: i });
+      board.drawMap({ index: i });
+    }
+    return players;
+  }
+  this.restart = function (snakes, snakeObj, board) {
+    let newSnake = this.populate(snakes.length, snakeObj, board);
+    snakes.length = 0;
+    snakes.push(...newSnake);
+    for (let loopId of board.loopIds) { board.endGame(loopId); }
+    this.resetScore();
+    runOnLoad();
+  }
   /*---------------------- Map ------------------------*/
-  this.getRandomAvailableLocation = function () {
+  this.getRandomAvailableLocation = function (bodies) {
     if (!this.isMapAvaible()) { this.wholeMap = this.getFullMap(); }
     let avaible = this.wholeMap.filter((item, i) => {
-      for (let body of this.bodies) {
+      for (let body of bodies) {
         if (body.x !== item.x) { return true; } 
         else if (body.y !== item.y) { return true; } 
         else if (body.x !== item.x && body.y !== item.y) { return false; }
@@ -17,21 +36,31 @@ function boardManager() {
     return avaible[Math.floor(Math.random() * avaible.length)];
   }
   this.isMapAvaible = function () {
-    if (this.wholeMap.length <= 0 || !Array.isArray(this.wholeMap)) {
-      return false;
-    }
-    return true;
+    return this.wholeMap && Array.isArray(this.wholeMap) ? true: false;
   }
   this.getFullMap = function () {
     let wholeMap = [];
-    for (let i = 0; i < totalBoxes; i++) {
-      for (let j = 0; j < totalBoxes; j++) {
-        wholeMap.push({ x: i * boxSize , y: j * boxSize });
+    for (let i = 0; i < this.gameBoard.totalBoxes; i++) {
+      for (let j = 0; j < this.gameBoard.totalBoxes; j++) {
+        wholeMap.push({
+          x: i * this.gameBoard.boxPixel,
+          y: j * this.gameBoard.boxPixel
+        });
       }
     }
     return wholeMap;
   }
-  
+  /*------------------ Spawn Food --------------------*/
+  this.spawnFood = function (snake, total=2) {
+    let location = null;
+    for (let i = 0; i < total; i++) {
+      location = this.getRandomAvailableLocation(snake.bodies);
+      snake.foods.push({
+        x: location.x,
+        y: location.y
+      });
+    }
+  }
   /*---------------------- UI ------------------------*/
   this.createCanvas = function (width, height, id) {
     let canvas = document.createElement("canvas");
@@ -67,27 +96,10 @@ function boardManager() {
       this.boardIds.push(div.id);
     }
   }
-  this.populate = function (quantity, snakeObj, board) {
-    let players = [];
-    for (let i = 0; i < quantity; i++) {
-      players.push(new snakeObj(board.boxPixel, board.totalBoxes, board.canvas[i]));
-      board.clearScreen({ index: i });
-      board.drawMap({ index: i });
-    }
-    return players;
-  }
-  this.updateScore = function () {
+  this.resetScore = function () {
     for (let board of this.boardIds) {
       let parent = document.querySelector(`[id="${board}"]`);
       parent.replaceChild(this.createScoreElement(), parent.firstChild);
     }
-  }
-  this.restart = function (snakes, snakeObj, board) {
-    let newSnake = this.populate(snakes.length, snakeObj, board);
-    snakes.length = 0;
-    snakes.push(...newSnake);
-    for (let loopId of board.loopIds) { board.endGame(loopId); }
-    this.updateScore();
-    runOnLoad();
   }
 }
