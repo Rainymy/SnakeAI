@@ -57,11 +57,11 @@ function update(loopIndex) {
     currentSnake.direction = currentSnake.pressQueue.shift();
   }
   
-  // if (!currentSnake.pressQueue.length) {
-  //   for (let move of makePrediction()) {
-  //     pressHandler(move, loopIndex);
-  //   }
-  // }
+  if (!currentSnake.pressQueue.length) {
+    for (let move of makePrediction()) {
+      pressHandler(move, loopIndex);
+    }
+  }
   
   // if (gameBoard.loopIds[0].index !== loopIndex.index) {
   //   pressHandler(makePrediction(), loopIndex);
