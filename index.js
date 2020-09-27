@@ -1,11 +1,6 @@
 const { app, BrowserWindow } = require('electron');
-const path = require('path');
-const isElectronDev = require('electron-is-dev');
 
-if (require('electron-squirrel-startup')) {
-  // eslint-disable-line global-require
-  app.quit();
-}
+if (require('electron-squirrel-startup')) { app.quit(); }
 
 const createWindow = () => {
   // Create the browser window.
@@ -18,10 +13,10 @@ const createWindow = () => {
     }
   });
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(require('path').join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  if (isElectronDev) { mainWindow.webContents.openDevTools(); }
+  if (require('electron-is-dev')) { mainWindow.webContents.openDevTools(); }
 };
 app.on('ready', createWindow);
 app.on('window-all-closed', () => {
