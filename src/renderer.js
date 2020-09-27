@@ -42,7 +42,7 @@ function update(loopIndex) {
         y: currentSnake.bodies[0].y,
         invisible: false
       });
-      let newFood = manager.getRandomAvailableLocation(currentSnake.bodies);
+      let newFood = manager.getRandomAvailableLocation(currentSnake.bodies, gameBoard.boxSize);
       currentSnake.foods.splice(index, 1, {
         x: newFood.x,
         y: newFood.y
@@ -57,16 +57,11 @@ function update(loopIndex) {
     currentSnake.direction = currentSnake.pressQueue.shift();
   }
   
-  if (!currentSnake.pressQueue.length) {
-    for (let move of makePrediction()) {
-      pressHandler(move, loopIndex);
-    }
-  }
-  
-  // if (gameBoard.loopIds[0].index !== loopIndex.index) {
-  //   pressHandler(makePrediction(), loopIndex);
+  // if (!currentSnake.pressQueue.length) {
+  //   for (let move of makePrediction()) {
+  //     pressHandler(move, loopIndex);
+  //   }
   // }
-  // pressHandler(makePrediction(), loopIndex);
 }
 
 function eventHandlers() {
