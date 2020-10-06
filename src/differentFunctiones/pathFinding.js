@@ -1,4 +1,5 @@
-function findPathFromTo() {
-  console.log("hello");
-  return;
+const aStar = {
+  findPathFromTo: function() {
+    console.log("hello");
+  }
 }
