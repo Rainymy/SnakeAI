@@ -41,7 +41,7 @@ function update(loopIndex) {
   }
   
   if (!currentSnake.pressQueue.length) {
-    for (let move of makePrediction()) {
+    for (let move of makePrediction(currentSnake)) {
       pressHandler(move, loopIndex);
     }
   }
