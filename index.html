@@ -32,7 +32,7 @@
               <b>Change</b>
               <script type="text/javascript">
                 let selected = document.currentScript.parentNode;
-                selected.onclick = (event) => {
+                selected.onclick = function () {
                   let number = parseInt(selected.previousElementSibling.value);
                   if (Number.isNaN(number) !== true) {
                     localStorage.setItem("totalCanvas", number);
@@ -42,13 +42,10 @@
               </script>
             </button>
           </div>
-          <div class="" style="display: none">
-            <span id="gameOver">Game Over</span>
-          </div>
         </div>
         <div class="gameDiv">
           <div class="">
-            <!-- Canvas dynamically adds in -->
+            <!-- Canvas dynamically adds here -->
           </div>
         </div>
         <div class="bottom">
@@ -59,10 +56,11 @@
       </div>
     </div>
   </body>
-  <!-- <script type="text/javascript"> console.log(ml5); </script> -->
+  <!-- <script defer type="text/javascript"> console.log(ml5); </script> -->
   <script defer src="./src/brain.js" charset="utf-8"></script>
   <script defer src="./src/objects/boardManager.js" charset="utf-8"></script>
   <script defer src="./src/objects/boardObject.js" charset="utf-8"></script>
   <script defer src="./src/objects/snakeObject.js" charset="utf-8"></script>
+  <script defer src="./src/objects/keyPressHandler.js" charset="utf-8"></script>
   <script defer src="./src/renderer.js" charset="utf-8"></script>
 </html>
