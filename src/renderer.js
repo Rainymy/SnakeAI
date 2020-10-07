@@ -45,6 +45,7 @@ function update(loopIndex) {
       pressHandler(move, loopIndex);
     }
   }
+  gameBoard.endGame(loopIndex);
 }
 
 function eventHandlers() {
@@ -52,6 +53,9 @@ function eventHandlers() {
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
       for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
+    }
+    else if (event.key === "§") {
+      aStar.init(currentSnake, manager.wholeMap);
     }
   });
   document.querySelector("#trying").addEventListener("click", () => {
