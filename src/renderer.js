@@ -55,7 +55,7 @@ function eventHandlers() {
       for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
     }
     else if (event.key === "§") {
-      aStar.init(currentSnake, manager.wholeMap);
+      aStar.search(currentSnake, manager.wholeMap);
     }
   });
   document.querySelector("#trying").addEventListener("click", () => {
