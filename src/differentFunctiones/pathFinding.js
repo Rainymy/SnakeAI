@@ -8,6 +8,23 @@ const aStar = new function () {
   }
   this.mapGrid = null;
   this.mapArrayWithPosition = null;
+  this.Math = new function () {
+    this.hypotenuse = function (a, b) {
+      return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+    }
+    this.getIndexWithHighestValue = function (array) {
+      let index = 0;
+      let highest = 0;
+      // go through the array and pick the first index then compare
+      // the first and second value, if second is higher then pick second
+      while (index++ < array.length) {
+        if (array[highest] > array[index]) {
+          highest = index;
+        }
+      }
+      return highest;
+    }
+  }
   this.getObjectArray = function(options, defaultValue) {
     return Object.assign({
       isWall: false,
@@ -59,11 +76,21 @@ const aStar = new function () {
     }
     return grid;
   }
-  this.findPathFromTo = function (snakeHead, food) {
+  this.findPathFromTo = function (head, food) {
+    console.log(head);
+    console.log(food);
     return null;
   }
   this.getNearestFood = function ( objects ) {
-    return objects;
+    let deltaX = null;
+    let deltaY = null;
+    let temp = [];
+    for (let food of objects.food) {
+      deltaX = food.row - objects.head.row;
+      deltaY = food.column - objects.head.column;
+      temp.push(this.Math.hypotenuse(deltaX, deltaY));
+    }
+    return objects.food[this.Math.getIndexWithHighestValue(temp)];
   }
   this.getAllObjectLocation = function() {
     let obj = { head: [], food: [] };
@@ -81,7 +108,9 @@ const aStar = new function () {
       this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
       this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
     }
-    this.getAllObjectLocation();
+    let allLocation = this.getAllObjectLocation();
+    let nearestFoodCoordinate = this.getNearestFood(allLocation);
+    this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
   }
 }
 
