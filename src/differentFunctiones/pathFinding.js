@@ -5,10 +5,18 @@ const aStar = new function () {
     WALL: 1,
     HEAD: 2,
     AIR: 0
-  }
+  };
+  this.STRAIGHT_COST = 1;
   this.mapGrid = null;
   this.mapArrayWithPosition = null;
+  
   this.Math = new function () {
+    this.parent = null;
+    this.init = function (parentObj) {
+      parentObj.Math 
+        ? this.parent = parentObj 
+        : console.log("Object isn't the parent");
+    }
     this.hypotenuse = function (a, b) {
       return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     }
@@ -24,6 +32,15 @@ const aStar = new function () {
       }
       return highest;
     }
+    this.getTileCost = function (startPos, endPos) {
+      let dx = startPos.row - endPos.row; 
+      let dy = startPos.column - endPos.column;;
+      return this.hypotenuse(dx, dy) * this.parent.STRAIGHT_COST;
+    }
+  }
+  this.update = function (obj, map) {
+    this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
+    this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
   }
   this.getObjectArray = function(options, defaultValue) {
     return Object.assign({
@@ -77,8 +94,10 @@ const aStar = new function () {
     return grid;
   }
   this.findPathFromTo = function (head, food) {
-    console.log(head);
-    console.log(food);
+    if (!this.Math.parent) { this.Math.init(this); }
+    
+    let cost = this.Math.getTileCost(head, food);
+    console.log(cost);
     return null;
   }
   this.getNearestFood = function ( objects ) {
@@ -103,11 +122,7 @@ const aStar = new function () {
     return obj;
   }
   this.search = function(obj, map) {
-    if (!this.mapGrid) {
-      let start = performance.now();
-      this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
-      this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
-    }
+    this.update(obj, map);
     let allLocation = this.getAllObjectLocation();
     let nearestFoodCoordinate = this.getNearestFood(allLocation);
     this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
