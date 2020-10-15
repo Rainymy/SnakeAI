@@ -34,8 +34,8 @@ const aStar = new function () {
     }
     this.getTileCost = function (startPos, endPos) {
       let dx = startPos.row - endPos.row; 
-      let dy = startPos.column - endPos.column;;
-      return this.hypotenuse(dx, dy) * this.parent.STRAIGHT_COST;
+      let dy = startPos.column - endPos.column;
+      return this.hypotenuse(dx, dy) + this.parent.STRAIGHT_COST;
     }
   }
   this.update = function (obj, map) {
@@ -93,11 +93,67 @@ const aStar = new function () {
     }
     return grid;
   }
+  this.getWalkablePaths = function (head) {
+    let walkableNodes = [];
+    if (this.mapGrid[head.row - 1]) {
+      if (this.mapGrid[head.row - 1][head.column] === 0) {
+        walkableNodes.push({ row: head.row - 1, column: head.column });
+      }
+    }
+    if (this.mapGrid[head.row + 1]) {
+      if (this.mapGrid[head.row + 1][head.column] === 0) {
+        walkableNodes.push({ row: head.row + 1, column: head.column })
+      }
+    }
+    if (this.mapGrid[head.row - 1]) {
+      if (this.mapGrid[head.row][head.column - 1] === 0) {
+        walkableNodes.push({ row: head.row, column: head.column - 1 })
+      }
+      if (this.mapGrid[head.row][head.column + 1] === 0) {
+        walkableNodes.push({ row: head.row, column: head.column + 1 })
+      }
+    }
+    return walkableNodes;
+  }
   this.findPathFromTo = function (head, food) {
     if (!this.Math.parent) { this.Math.init(this); }
+    let isPathFound = false;
+    let current;
     
+    let openNode = [];
+    let closedNode = [];
+    
+    
+    while (!isPathFound) {
+      console.log("Searching....");
+      console.log(this.getWalkablePaths(head));
+      isPathFound = true;
+    }
+    /*
+    OPEN //the set of nodes to be evaluated
+    CLOSED //the set of nodes already evaluated
+    add the start node to OPEN
+     
+    loop
+            current = node in OPEN with the lowest f_cost
+            remove current from OPEN
+            add current to CLOSED
+     
+            if current is the target node //path has been found
+                    return
+     
+            foreach neighbour of the current node
+                    if neighbour is not traversable or neighbour is in CLOSED
+                            skip to the next neighbour
+     
+                    if new path to neighbour is shorter OR neighbour is not in OPEN
+                            set f_cost of neighbour
+                            set parent of neighbour to current
+                            if neighbour is not in OPEN
+                                    add neighbour to OPEN
+    
+    */
     let cost = this.Math.getTileCost(head, food);
-    console.log(cost);
     return null;
   }
   this.getNearestFood = function ( objects ) {
