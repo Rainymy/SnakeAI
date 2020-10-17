@@ -32,10 +32,26 @@ const aStar = new function () {
       }
       return highest;
     }
-    this.getTileCost = function (startPos, endPos) {
-      let dx = startPos.row - endPos.row; 
-      let dy = startPos.column - endPos.column;
-      return this.hypotenuse(dx, dy) + this.parent.STRAIGHT_COST;
+    this.heuristic = function (start, end) {
+      let dx = Math.abs(end.row - start.row);
+      let dy = Math.abs(end.column - start.column);
+      return dx + dy;
+    }
+    this.getTileCost = function (startPos, midPos, endPos) {
+      let dx = startPos.row - midPos.row; 
+      let dy = startPos.column - midPos.column;
+      let dx1 = midPos.row - endPos.row;
+      let dy1 = midPos.column - endPos.column;
+      
+      return this.heuristic(startPos, endPos);
+      // return this.hypotenuse(dx, dy) + this.hypotenuse(dx1, dy1);
+    }
+    this.getLowestCostTile = function (array, main, endPos) {
+      let temp = [];
+      for (let middle of array) {
+        temp.push(this.getTileCost(main, middle, endPos));
+      }
+      return array[this.getIndexWithHighestValue(temp)];
     }
   }
   this.update = function (obj, map) {
@@ -93,10 +109,13 @@ const aStar = new function () {
     }
     return grid;
   }
-  this.getWalkablePaths = function (head) {
+  this.getWalkableNeighbour = function (head, walked) {
     let walkableNodes = [];
     if (this.mapGrid[head.row - 1]) {
       if (this.mapGrid[head.row - 1][head.column] === 0) {
+        walkableNodes.push({ row: head.row - 1, column: head.column });
+      }
+      else if (this.mapGrid[head.row - 1][head.column] === -1) {
         walkableNodes.push({ row: head.row - 1, column: head.column });
       }
     }
@@ -104,57 +123,76 @@ const aStar = new function () {
       if (this.mapGrid[head.row + 1][head.column] === 0) {
         walkableNodes.push({ row: head.row + 1, column: head.column })
       }
-    }
-    if (this.mapGrid[head.row - 1]) {
-      if (this.mapGrid[head.row][head.column - 1] === 0) {
-        walkableNodes.push({ row: head.row, column: head.column - 1 })
+      else if (this.mapGrid[head.row + 1][head.column] === -1) {
+        walkableNodes.push({ row: head.row + 1, column: head.column })
       }
-      if (this.mapGrid[head.row][head.column + 1] === 0) {
-        walkableNodes.push({ row: head.row, column: head.column + 1 })
+    }
+    if (this.mapGrid[head.row][head.column - 1] === 0) {
+      walkableNodes.push({ row: head.row, column: head.column - 1 })
+    }
+    else if (this.mapGrid[head.row][head.column - 1] === -1) {
+      walkableNodes.push({ row: head.row, column: head.column - 1 })
+    }
+    if (this.mapGrid[head.row][head.column + 1] === 0) {
+      walkableNodes.push({ row: head.row, column: head.column + 1 })
+    }
+    else if (this.mapGrid[head.row][head.column + 1] === -1) {
+      walkableNodes.push({ row: head.row, column: head.column + 1 })
+    }
+    for (let i = 0; i < walked.length; i++) {
+      for (let j = 0; j < walkableNodes.length; j++) {
+        if ( walkableNodes[j].row === walked[i].row && 
+            walkableNodes[j].column === walked[i].column ) {
+          walkableNodes.splice(j, 1);
+          j--;
+        };
       }
     }
     return walkableNodes;
   }
+  this.colourize = function (array) {
+    for (let [i, per] of array.reverse().entries()) {
+      gameBoard.colourize(per, i === array.length - 1 ? true: false);
+    }
+  }
+  this.tracePath = function (curr) {
+    let ret = [];
+    while (curr.parent) { ret.push(curr); curr = curr.parent; }
+    // this.colourize(ret);
+    return ret.reverse();
+  }
   this.findPathFromTo = function (head, food) {
     if (!this.Math.parent) { this.Math.init(this); }
-    let isPathFound = false;
-    let current;
     
-    let openNode = [];
+    
     let closedNode = [];
+    let openNode = [head];
+    let hasBeen = [];
     
+    let currentNode;
+    let totalLoop = 0;
     
-    while (!isPathFound) {
-      console.log("Searching....");
-      console.log(this.getWalkablePaths(head));
-      isPathFound = true;
+    while (openNode.length) {
+      currentNode = this.Math.getLowestCostTile(openNode, head, food);
+      if (currentNode.row === food.row && currentNode.column === food.column) {
+        console.log("PATH FOUND");
+        return this.tracePath(currentNode);
+      }
+      closedNode.push(openNode.splice(openNode.indexOf(currentNode), 1));
+      for (let neighbour of this.getWalkableNeighbour(currentNode, closedNode)) {
+        if (!currentNode.visited || -1 === openNode.indexOf(neighbour)) {
+          neighbour.parent = currentNode;
+          neighbour.visited = true;
+          openNode.push(neighbour);
+          hasBeen.push(currentNode);
+        }
+      }
+      if (++totalLoop === 100) {
+        // this.colourize(hasBeen);
+        console.log("PATH NOT FOUND!");
+        break;
+      }
     }
-    /*
-    OPEN //the set of nodes to be evaluated
-    CLOSED //the set of nodes already evaluated
-    add the start node to OPEN
-     
-    loop
-            current = node in OPEN with the lowest f_cost
-            remove current from OPEN
-            add current to CLOSED
-     
-            if current is the target node //path has been found
-                    return
-     
-            foreach neighbour of the current node
-                    if neighbour is not traversable or neighbour is in CLOSED
-                            skip to the next neighbour
-     
-                    if new path to neighbour is shorter OR neighbour is not in OPEN
-                            set f_cost of neighbour
-                            set parent of neighbour to current
-                            if neighbour is not in OPEN
-                                    add neighbour to OPEN
-    
-    */
-    let cost = this.Math.getTileCost(head, food);
-    return null;
   }
   this.getNearestFood = function ( objects ) {
     let deltaX = null;
@@ -177,11 +215,31 @@ const aStar = new function () {
     }
     return obj;
   }
+  this.translate = function (instructions, startPos) {
+    let keyPressOrder = [];
+    let last = startPos;
+    for (let instruction of instructions || []) {
+      if (0 > last.row - instruction.row) {
+        keyPressOrder.push("d");
+      }
+      else if (0 < last.row - instruction.row) {
+        keyPressOrder.push("a");
+      }
+      else if (0 > last.column - instruction.column) {
+        keyPressOrder.push("s");
+      }
+      else if (0 < last.column - instruction.column) {
+        keyPressOrder.push("w");
+      }
+      last = instruction;
+    }
+    return keyPressOrder;
+  }
   this.search = function(obj, map) {
     this.update(obj, map);
     let allLocation = this.getAllObjectLocation();
     let nearestFoodCoordinate = this.getNearestFood(allLocation);
-    this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
+    let foundPath = this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
+    return this.translate(foundPath, allLocation.head);
   }
 }
-

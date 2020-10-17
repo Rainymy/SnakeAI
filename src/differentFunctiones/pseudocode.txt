@@ -1,0 +1,38 @@
+<----------------------------------------------------------------------------->
+push startNode onto openList
+while(openList is not empty) {
+ currentNode = find lowest f in openList
+ if currentNode is final, return the successful path
+ push currentNode onto closedList and remove from openList
+ foreach neighbor of currentNode {
+     if neighbor is not in openList {
+            save g, h, and f then save the current parent
+            add neighbor to openList
+     }
+     if neighbor is in openList but the current g is better than previous g {
+             save g and f, then save the current parent
+     }
+ }
+<----------------------------------------------------------------------------->
+OPEN //the set of nodes to be evaluated
+CLOSED //the set of nodes already evaluated
+add the start node to OPEN
+ 
+loop
+        current = node in OPEN with the lowest f_cost
+        remove current from OPEN
+        add current to CLOSED
+ 
+        if current is the target node //path has been found
+                return
+ 
+        foreach neighbour of the current node
+                if neighbour is not traversable or neighbour is in CLOSED
+                        skip to the next neighbour
+ 
+                if new path to neighbour is shorter OR neighbour is not in OPEN
+                        set f_cost of neighbour
+                        set parent of neighbour to current
+                        if neighbour is not in OPEN
+                                add neighbour to OPEN
+<----------------------------------------------------------------------------->

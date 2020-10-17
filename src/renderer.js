@@ -1,4 +1,4 @@
-let totalRowBoxes = 25;
+let totalRowBoxes = 14;
 let gameBoard;
 let snakes = [];
 let manager = null;
@@ -42,14 +42,14 @@ function update(loopIndex) {
   
   if (!currentSnake.pressQueue.length) {
     for (let move of makePrediction(currentSnake)) {
-      pressHandler(move, loopIndex);
+      pressHandler({ key:move }, loopIndex);
     }
   }
-  gameBoard.endGame(loopIndex);
+  // gameBoard.endGame(loopIndex);
 }
 
 function eventHandlers() {
-  document.body.addEventListener("keypress", pressHandler);
+  // document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
       for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);

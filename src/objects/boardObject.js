@@ -82,6 +82,28 @@ function boardProps(boxes) {
   this.character = (bodies, loopObj) => {
     this.drawSolidRect(bodies[0].x, bodies[0].y, loopObj.index, "red");
   }
+  this.convertFromGridToPosition = (location) => {
+    return { x: location.row * this.boxPixel, y: location.column * this.boxPixel }
+  }
+  this.container = [];
+  this.colourize = (position, visualize) => {
+    let location = position;
+    if (location.hasOwnProperty("row")) {
+      location = this.convertFromGridToPosition(position);
+    }
+    this.container.push(location);
+    if (visualize) {
+      let id = setInterval(() => {
+        let curr = this.container.pop();
+        if (this.container.length < 2) {
+          clearInterval(id);
+        }
+        let randomNumber = Math.floor(Math.random()*16777215);
+        let randomColour ='#' + randomNumber.toString(16).padStart(6, '0');
+        this.drawSolidRect(curr.x, curr.y, 0, randomColour);
+      }, 250);
+    }
+  }
   this.drawSqure = (x, y, index) => {
     let context = this.ctx[index];
     context.beginPath();
