@@ -42,7 +42,7 @@ function update(loopIndex) {
   
   if (!currentSnake.pressQueue.length) {
     for (let move of makePrediction(currentSnake)) {
-      pressHandler({ key:move }, loopIndex);
+      pressHandler({ key: move }, loopIndex);
     }
   }
   // gameBoard.endGame(loopIndex);

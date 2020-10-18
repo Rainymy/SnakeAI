@@ -6,17 +6,50 @@ const aStar = new function () {
     HEAD: 2,
     AIR: 0
   };
+  function lastElement(array) { return array[array.length - 1]; }
+  
   this.STRAIGHT_COST = 1;
   this.mapGrid = null;
   this.mapArrayWithPosition = null;
   
-  this.Math = new function () {
-    this.parent = null;
-    this.init = function (parentObj) {
-      parentObj.Math 
-        ? this.parent = parentObj 
-        : console.log("Object isn't the parent");
+  
+  this.customProtos = new function () {
+    this.getObjectArray = function(options, defaultValue) {
+      return Object.assign({
+        isWall: false,
+        isFood: false, 
+        isHead: false
+      }, options, defaultValue);
     }
+    this.getNearestLocation = function (array, endPos) {
+      // loop through paths and return the nearest path from end position
+      console.log(array);
+    }
+    this.colourize = function (array, endPos) {
+      for (let [i, per] of array.reverse().entries()) {
+        gameBoard.colourize(per, i === array.length - 1 ? true: false);
+      }
+      this.getNearestLocation(array, endPos);
+    }
+    this.compareValues = function (firstValue, array) {
+      if (firstValue == undefined) { return false; }
+      for (let value of array) { if (firstValue === value) { return true; }}
+      return false;
+    }
+    this.translate = function (instructions, startPos) {
+      let keyPressOrder = [];
+      let last = startPos;
+      for (let instruction of instructions || []) {
+        if (0 > last.row - instruction.row) { keyPressOrder.push("d"); }
+        else if (0 < last.row - instruction.row) { keyPressOrder.push("a"); }
+        else if (0 > last.column - instruction.column) { keyPressOrder.push("s"); }
+        else if (0 < last.column - instruction.column) { keyPressOrder.push("w"); }
+        last = instruction;
+      }
+      return keyPressOrder;
+    }
+  }
+  this.Math = new function () {
     this.hypotenuse = function (a, b) {
       return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     }
@@ -37,33 +70,13 @@ const aStar = new function () {
       let dy = Math.abs(end.column - start.column);
       return dx + dy;
     }
-    this.getTileCost = function (startPos, midPos, endPos) {
-      let dx = startPos.row - midPos.row; 
-      let dy = startPos.column - midPos.column;
-      let dx1 = midPos.row - endPos.row;
-      let dy1 = midPos.column - endPos.column;
-      
-      return this.heuristic(startPos, endPos);
-      // return this.hypotenuse(dx, dy) + this.hypotenuse(dx1, dy1);
-    }
-    this.getLowestCostTile = function (array, main, endPos) {
+    this.getLowestCostTile = function (array, endPos) {
       let temp = [];
       for (let middle of array) {
-        temp.push(this.getTileCost(main, middle, endPos));
+        temp.push(this.heuristic(middle, endPos));
       }
       return array[this.getIndexWithHighestValue(temp)];
     }
-  }
-  this.update = function (obj, map) {
-    this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
-    this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
-  }
-  this.getObjectArray = function(options, defaultValue) {
-    return Object.assign({
-      isWall: false,
-      isFood: false, 
-      isHead: false
-    }, options, defaultValue);
   }
   this.convertGridToArray = function(list, walls, foods) {
     let grid = [];
@@ -75,19 +88,21 @@ const aStar = new function () {
       }
       for (let food of foods) {
         if (food.x === current.x && food.y === current.y) {
-          grid[grid.length - 1].push(this.getObjectArray({ isFood: true }, current));
+          lastElement(grid).push(this.customProtos.getObjectArray({
+            isFood: true
+          }, current));
           continue outer;
         }
       }
       for (let [j, wall] of walls.entries()) {
         if (j !== 0 && wall.x === current.x && wall.y === current.y) {
-          grid[grid.length - 1].push(
-            this.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
+          lastElement(grid).push(
+            this.customProtos.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
           );
           continue outer;
         }
       }
-      grid[grid.length - 1].push(this.getObjectArray(current));
+      lastElement(grid).push(this.customProtos.getObjectArray(current));
     }
     return grid;
   }
@@ -101,94 +116,81 @@ const aStar = new function () {
           grid.push([]);
         }
         
-             if (obj.isHead) { grid[grid.length - 1].push(Initial.HEAD); } 
-        else if (obj.isWall) { grid[grid.length - 1].push(Initial.WALL); } 
-        else if (obj.isFood) { grid[grid.length - 1].push(Initial.FOOD); } 
-        else                 { grid[grid.length - 1].push(Initial.AIR); }
+             if (obj.isHead) { lastElement(grid).push(Initial.HEAD); } 
+        else if (obj.isWall) { lastElement(grid).push(Initial.WALL); } 
+        else if (obj.isFood) { lastElement(grid).push(Initial.FOOD); } 
+        else                 { lastElement(grid).push(Initial.AIR); }
       }
     }
     return grid;
   }
-  this.getWalkableNeighbour = function (head, walked) {
-    let walkableNodes = [];
-    if (this.mapGrid[head.row - 1]) {
-      if (this.mapGrid[head.row - 1][head.column] === 0) {
-        walkableNodes.push({ row: head.row - 1, column: head.column });
-      }
-      else if (this.mapGrid[head.row - 1][head.column] === -1) {
-        walkableNodes.push({ row: head.row - 1, column: head.column });
-      }
-    }
-    if (this.mapGrid[head.row + 1]) {
-      if (this.mapGrid[head.row + 1][head.column] === 0) {
-        walkableNodes.push({ row: head.row + 1, column: head.column })
-      }
-      else if (this.mapGrid[head.row + 1][head.column] === -1) {
-        walkableNodes.push({ row: head.row + 1, column: head.column })
-      }
-    }
-    if (this.mapGrid[head.row][head.column - 1] === 0) {
-      walkableNodes.push({ row: head.row, column: head.column - 1 })
-    }
-    else if (this.mapGrid[head.row][head.column - 1] === -1) {
-      walkableNodes.push({ row: head.row, column: head.column - 1 })
-    }
-    if (this.mapGrid[head.row][head.column + 1] === 0) {
-      walkableNodes.push({ row: head.row, column: head.column + 1 })
-    }
-    else if (this.mapGrid[head.row][head.column + 1] === -1) {
-      walkableNodes.push({ row: head.row, column: head.column + 1 })
-    }
-    for (let i = 0; i < walked.length; i++) {
-      for (let j = 0; j < walkableNodes.length; j++) {
-        if ( walkableNodes[j].row === walked[i].row && 
-            walkableNodes[j].column === walked[i].column ) {
-          walkableNodes.splice(j, 1);
-          j--;
-        };
-      }
-    }
-    return walkableNodes;
+  this.update = function (obj, map) {
+    this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
+    this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
   }
-  this.colourize = function (array) {
-    for (let [i, per] of array.reverse().entries()) {
-      gameBoard.colourize(per, i === array.length - 1 ? true: false);
+  this.getWalkableNeighbours = function (head, walked) {
+    let walkableNodes = new Set([]);
+    let compareValues = [ Initial.AIR, Initial.FOOD ];
+    
+    let leftRow = this.mapGrid[head.row - 1] || [];
+    let rightRow = this.mapGrid[head.row + 1] || [];
+    
+    let top = leftRow[head.column];
+    let bottom = rightRow[head.column];
+    let left = this.mapGrid[head.row][head.column - 1];
+    let right = this.mapGrid[head.row][head.column + 1];
+    
+    if (this.customProtos.compareValues(top, compareValues)){
+      walkableNodes.add({ row: head.row - 1, column: head.column });
     }
-  }
-  this.tracePath = function (curr) {
-    let ret = [];
-    while (curr.parent) { ret.push(curr); curr = curr.parent; }
-    // this.colourize(ret);
-    return ret.reverse();
+    if (this.customProtos.compareValues(bottom, compareValues)){
+      walkableNodes.add({ row: head.row + 1, column: head.column });
+    }
+    if (this.customProtos.compareValues(left, compareValues)) {
+      walkableNodes.add({ row: head.row, column: head.column - 1 });
+    }
+    if (this.customProtos.compareValues(right, compareValues)) {
+      walkableNodes.add({ row: head.row, column: head.column + 1 });
+    }
+    for (let node of walkableNodes.values()) {
+      for (let i = 0; i < walked.length; i++) {
+        if (walked[i].row === node.row && walked[i].column === node.column) {
+          walkableNodes.delete(node);
+          break;
+        }
+      }
+    }
+    return [...walkableNodes];
   }
   this.findPathFromTo = function (head, food) {
-    if (!this.Math.parent) { this.Math.init(this); }
-    
-    
     let closedNode = [];
     let openNode = [head];
-    let hasBeen = [];
     
     let currentNode;
     let totalLoop = 0;
     
     while (openNode.length) {
-      currentNode = this.Math.getLowestCostTile(openNode, head, food);
+      currentNode = this.Math.getLowestCostTile(openNode, food);
       if (currentNode.row === food.row && currentNode.column === food.column) {
         console.log("PATH FOUND");
-        return this.tracePath(currentNode);
+        let ret = [];
+        let curr = currentNode;
+        while (curr.parent) {
+          ret.push(curr); 
+          curr = curr.parent;
+        }
+        return ret.reverse();
       }
-      closedNode.push(openNode.splice(openNode.indexOf(currentNode), 1));
-      for (let neighbour of this.getWalkableNeighbour(currentNode, closedNode)) {
+      closedNode.push(...openNode.splice(openNode.indexOf(currentNode), 1));
+      for (let neighbour of this.getWalkableNeighbours(currentNode, closedNode)) {
         if (!currentNode.visited || -1 === openNode.indexOf(neighbour)) {
           neighbour.parent = currentNode;
           neighbour.visited = true;
           openNode.push(neighbour);
-          hasBeen.push(currentNode);
         }
       }
-      if (++totalLoop === 100) {
-        // this.colourize(hasBeen);
+      if (++totalLoop === 20) {
+        // this.debug.colourize(hasBeen, food);
         console.log("PATH NOT FOUND!");
         break;
       }
@@ -201,7 +203,7 @@ const aStar = new function () {
     for (let food of objects.food) {
       deltaX = food.row - objects.head.row;
       deltaY = food.column - objects.head.column;
-      temp.push(this.Math.hypotenuse(deltaX, deltaY));
+      temp.push(deltaX + deltaY);
     }
     return objects.food[this.Math.getIndexWithHighestValue(temp)];
   }
@@ -215,31 +217,11 @@ const aStar = new function () {
     }
     return obj;
   }
-  this.translate = function (instructions, startPos) {
-    let keyPressOrder = [];
-    let last = startPos;
-    for (let instruction of instructions || []) {
-      if (0 > last.row - instruction.row) {
-        keyPressOrder.push("d");
-      }
-      else if (0 < last.row - instruction.row) {
-        keyPressOrder.push("a");
-      }
-      else if (0 > last.column - instruction.column) {
-        keyPressOrder.push("s");
-      }
-      else if (0 < last.column - instruction.column) {
-        keyPressOrder.push("w");
-      }
-      last = instruction;
-    }
-    return keyPressOrder;
-  }
   this.search = function(obj, map) {
     this.update(obj, map);
     let allLocation = this.getAllObjectLocation();
     let nearestFoodCoordinate = this.getNearestFood(allLocation);
     let foundPath = this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
-    return this.translate(foundPath, allLocation.head);
+    return this.customProtos.translate(foundPath, allLocation.head);
   }
 }
