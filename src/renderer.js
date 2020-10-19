@@ -37,12 +37,12 @@ function update(loopIndex) {
   gameBoard.drawMapPart(gameBoard.moveSnake(currentSnake, loopIndex), loopIndex);
   
   if (currentSnake.pressQueue.length) {
-    currentSnake.direction = currentSnake.pressQueue.shift();
+    currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
   }
   
   if (!currentSnake.pressQueue.length) {
-    for (let move of makePrediction(currentSnake)) {
-      pressHandler({ key: move }, loopIndex);
+    for (let move of makePrediction(currentSnake, currentSnake.direction)) {
+      currentSnake.pressQueue.push(pressHandler({ key: move }, currentSnake.direction));
     }
   }
   // gameBoard.endGame(loopIndex);

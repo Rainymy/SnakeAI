@@ -6,18 +6,18 @@ const aStar = new function () {
     HEAD: 2,
     AIR: 0
   };
-  function lastElement(array) { return array[array.length - 1]; }
   
-  this.STRAIGHT_COST = 1;
   this.mapGrid = null;
   this.mapArrayWithPosition = null;
   
-  
   this.customProtos = new function () {
+    this.lastElement = function (array) {
+      return array[array.length - 1];
+    }
     this.getObjectArray = function(options, defaultValue) {
       return Object.assign({
         isWall: false,
-        isFood: false, 
+        isFood: false,
         isHead: false
       }, options, defaultValue);
     }
@@ -88,7 +88,7 @@ const aStar = new function () {
       }
       for (let food of foods) {
         if (food.x === current.x && food.y === current.y) {
-          lastElement(grid).push(this.customProtos.getObjectArray({
+          this.customProtos.lastElement(grid).push(this.customProtos.getObjectArray({
             isFood: true
           }, current));
           continue outer;
@@ -96,13 +96,13 @@ const aStar = new function () {
       }
       for (let [j, wall] of walls.entries()) {
         if (j !== 0 && wall.x === current.x && wall.y === current.y) {
-          lastElement(grid).push(
+          this.customProtos.lastElement(grid).push(
             this.customProtos.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
           );
           continue outer;
         }
       }
-      lastElement(grid).push(this.customProtos.getObjectArray(current));
+      this.customProtos.lastElement(grid).push(this.customProtos.getObjectArray(current));
     }
     return grid;
   }
@@ -116,10 +116,10 @@ const aStar = new function () {
           grid.push([]);
         }
         
-             if (obj.isHead) { lastElement(grid).push(Initial.HEAD); } 
-        else if (obj.isWall) { lastElement(grid).push(Initial.WALL); } 
-        else if (obj.isFood) { lastElement(grid).push(Initial.FOOD); } 
-        else                 { lastElement(grid).push(Initial.AIR); }
+             if (obj.isHead) { this.customProtos.lastElement(grid).push(Initial.HEAD); } 
+        else if (obj.isWall) { this.customProtos.lastElement(grid).push(Initial.WALL); } 
+        else if (obj.isFood) { this.customProtos.lastElement(grid).push(Initial.FOOD); } 
+        else                 { this.customProtos.lastElement(grid).push(Initial.AIR); }
       }
     }
     return grid;
@@ -132,13 +132,14 @@ const aStar = new function () {
     let walkableNodes = new Set([]);
     let compareValues = [ Initial.AIR, Initial.FOOD ];
     
+    let middleRow = this.mapGrid[head.row];
     let leftRow = this.mapGrid[head.row - 1] || [];
     let rightRow = this.mapGrid[head.row + 1] || [];
     
     let top = leftRow[head.column];
     let bottom = rightRow[head.column];
-    let left = this.mapGrid[head.row][head.column - 1];
-    let right = this.mapGrid[head.row][head.column + 1];
+    let left = middleRow[head.column - 1];
+    let right = middleRow[head.column + 1];
     
     if (this.customProtos.compareValues(top, compareValues)){
       walkableNodes.add({ row: head.row - 1, column: head.column });
@@ -189,12 +190,13 @@ const aStar = new function () {
           openNode.push(neighbour);
         }
       }
-      if (++totalLoop === 20) {
+      if (++totalLoop === 100) {
         // this.debug.colourize(hasBeen, food);
         console.log("PATH NOT FOUND!");
         break;
       }
     }
+    return;
   }
   this.getNearestFood = function ( objects ) {
     let deltaX = null;
@@ -217,11 +219,11 @@ const aStar = new function () {
     }
     return obj;
   }
-  this.search = function(obj, map) {
+  this.search = function(obj, map, direction) {
     this.update(obj, map);
-    let allLocation = this.getAllObjectLocation();
-    let nearestFoodCoordinate = this.getNearestFood(allLocation);
-    let foundPath = this.findPathFromTo(allLocation.head, nearestFoodCoordinate);
-    return this.customProtos.translate(foundPath, allLocation.head);
+    let objLocations = this.getAllObjectLocation();
+    let nearestFoodCoordinate = this.getNearestFood(objLocations);
+    let foundPath = this.findPathFromTo(objLocations.head, nearestFoodCoordinate, direction);
+    return this.customProtos.translate(foundPath, objLocations.head);
   }
 }
