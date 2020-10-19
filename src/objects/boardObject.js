@@ -87,20 +87,18 @@ function boardProps(boxes) {
   }
   this.container = [];
   this.colourize = (position, visualize) => {
-    let location = position;
-    if (location.hasOwnProperty("row")) {
+    let location;
+    if (position.hasOwnProperty("row")) {
       location = this.convertFromGridToPosition(position);
     }
     this.container.push(location);
     if (visualize) {
       let id = setInterval(() => {
-        let curr = this.container.pop();
-        if (this.container.length < 2) {
-          clearInterval(id);
+        if (this.container.length <= 0) {
+          return clearInterval(id);
         }
-        let randomNumber = Math.floor(Math.random()*16777215);
-        let randomColour ='#' + randomNumber.toString(16).padStart(6, '0');
-        this.drawSolidRect(curr.x, curr.y, 0, randomColour);
+        let curr = this.container.shift();
+        this.drawSolidRect(curr.x, curr.y, 0, "white");
       }, 250);
     }
   }

@@ -10,9 +10,26 @@ const aStar = new function () {
   this.mapGrid = null;
   this.mapArrayWithPosition = null;
   
-  this.customProtos = new function () {
+  this.proto = new function () {
     this.lastElement = function (array) {
       return array[array.length - 1];
+    }
+    this.isSameCoordinate = function (startPos, endPos) {
+      if (!endPos) { return false; }
+      if (!startPos) { return false; }
+      
+      let endX = endPos[ endPos.hasOwnProperty("x") ? "x": "row" ];
+      let endY = endPos[ endPos.hasOwnProperty("y") ? "y": "column" ];
+      let startX = startPos[ startPos.hasOwnProperty("x") ? "x": "row" ];
+      let startY = startPos[ startPos.hasOwnProperty("y") ? "y": "column" ];
+      
+      return startX === endX && startY === endY;
+    }
+    this.getInitialValues = function (obj) {
+      return obj.isHead 
+              ? Initial.HEAD : obj.isWall 
+                ? Initial.WALL : obj.isFood 
+                  ? Initial.FOOD : Initial.AIR
     }
     this.getObjectArray = function(options, defaultValue) {
       return Object.assign({
@@ -26,10 +43,11 @@ const aStar = new function () {
       console.log(array);
     }
     this.colourize = function (array, endPos) {
-      for (let [i, per] of array.reverse().entries()) {
-        gameBoard.colourize(per, i === array.length - 1 ? true: false);
+      let copy = array.slice();
+      for (let [i, per] of copy.entries()) {
+        gameBoard.colourize(per, i === copy.length - 1 ? true: false);
       }
-      this.getNearestLocation(array, endPos);
+      // this.getNearestLocation(copy, endPos);
     }
     this.compareValues = function (firstValue, array) {
       if (firstValue == undefined) { return false; }
@@ -78,7 +96,16 @@ const aStar = new function () {
       return array[this.getIndexWithHighestValue(temp)];
     }
   }
-  this.convertGridToArray = function(list, walls, foods) {
+  this.checkAroundMoves = function (foundPath, food) {
+    let checkedArray = [];
+    for (let path of foundPath) {
+      for (let neighbour of this.getWalkableNeighbours(path)) {
+        this.proto.isSameCoordinate(neighbour, food);
+      }
+    }
+    return;
+  }
+  this.convertGridToArray = function (list, walls, foods) {
     let grid = [];
     let last = null;
     outer: for (let current of list) {
@@ -88,21 +115,22 @@ const aStar = new function () {
       }
       for (let food of foods) {
         if (food.x === current.x && food.y === current.y) {
-          this.customProtos.lastElement(grid).push(this.customProtos.getObjectArray({
+          this.proto.lastElement(grid).push(this.proto.getObjectArray({
             isFood: true
           }, current));
           continue outer;
         }
       }
       for (let [j, wall] of walls.entries()) {
-        if (j !== 0 && wall.x === current.x && wall.y === current.y) {
-          this.customProtos.lastElement(grid).push(
-            this.customProtos.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
+        if (j !== 0 && this.proto.isSameCoordinate(wall, current)) {
+          this.proto.isSameCoordinate(wall, current);
+          this.proto.lastElement(grid).push(
+            this.proto.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
           );
           continue outer;
         }
       }
-      this.customProtos.lastElement(grid).push(this.customProtos.getObjectArray(current));
+      this.proto.lastElement(grid).push(this.proto.getObjectArray(current));
     }
     return grid;
   }
@@ -115,11 +143,7 @@ const aStar = new function () {
           last = obj;
           grid.push([]);
         }
-        
-             if (obj.isHead) { this.customProtos.lastElement(grid).push(Initial.HEAD); } 
-        else if (obj.isWall) { this.customProtos.lastElement(grid).push(Initial.WALL); } 
-        else if (obj.isFood) { this.customProtos.lastElement(grid).push(Initial.FOOD); } 
-        else                 { this.customProtos.lastElement(grid).push(Initial.AIR); }
+        this.proto.lastElement(grid).push(this.proto.getInitialValues(obj));
       }
     }
     return grid;
@@ -129,10 +153,11 @@ const aStar = new function () {
     this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
   }
   this.getWalkableNeighbours = function (head, walked) {
+    walked = walked || [];
     let walkableNodes = new Set([]);
     let compareValues = [ Initial.AIR, Initial.FOOD ];
     
-    let middleRow = this.mapGrid[head.row];
+    let middleRow = this.mapGrid[head.row] || [];
     let leftRow = this.mapGrid[head.row - 1] || [];
     let rightRow = this.mapGrid[head.row + 1] || [];
     
@@ -141,21 +166,21 @@ const aStar = new function () {
     let left = middleRow[head.column - 1];
     let right = middleRow[head.column + 1];
     
-    if (this.customProtos.compareValues(top, compareValues)){
+    if (this.proto.compareValues(top, compareValues)){
       walkableNodes.add({ row: head.row - 1, column: head.column });
     }
-    if (this.customProtos.compareValues(bottom, compareValues)){
+    if (this.proto.compareValues(bottom, compareValues)){
       walkableNodes.add({ row: head.row + 1, column: head.column });
     }
-    if (this.customProtos.compareValues(left, compareValues)) {
+    if (this.proto.compareValues(left, compareValues)) {
       walkableNodes.add({ row: head.row, column: head.column - 1 });
     }
-    if (this.customProtos.compareValues(right, compareValues)) {
+    if (this.proto.compareValues(right, compareValues)) {
       walkableNodes.add({ row: head.row, column: head.column + 1 });
     }
     for (let node of walkableNodes.values()) {
       for (let i = 0; i < walked.length; i++) {
-        if (walked[i].row === node.row && walked[i].column === node.column) {
+        if (this.proto.isSameCoordinate(walked[i], node)) {
           walkableNodes.delete(node);
           break;
         }
@@ -163,7 +188,7 @@ const aStar = new function () {
     }
     return [...walkableNodes];
   }
-  this.findPathFromTo = function (head, food) {
+  this.findPathFromTo = function (head, food, direction, index, score) {
     let closedNode = [];
     let openNode = [head];
     
@@ -172,7 +197,7 @@ const aStar = new function () {
     
     while (openNode.length) {
       currentNode = this.Math.getLowestCostTile(openNode, food);
-      if (currentNode.row === food.row && currentNode.column === food.column) {
+      if (this.proto.isSameCoordinate(currentNode, food)) {
         console.log("PATH FOUND");
         let ret = [];
         let curr = currentNode;
@@ -180,6 +205,7 @@ const aStar = new function () {
           ret.push(curr); 
           curr = curr.parent;
         }
+        // this.proto.colourize(ret, food);
         return ret.reverse();
       }
       closedNode.push(...openNode.splice(openNode.indexOf(currentNode), 1));
@@ -191,7 +217,7 @@ const aStar = new function () {
         }
       }
       if (++totalLoop === 100) {
-        // this.debug.colourize(hasBeen, food);
+        // this.proto.colourize(hasBeen, food);
         console.log("PATH NOT FOUND!");
         break;
       }
@@ -203,8 +229,8 @@ const aStar = new function () {
     let deltaY = null;
     let temp = [];
     for (let food of objects.food) {
-      deltaX = food.row - objects.head.row;
-      deltaY = food.column - objects.head.column;
+      deltaX = Math.abs(food.row - objects.head.row);
+      deltaY = Math.abs(food.column - objects.head.column);
       temp.push(deltaX + deltaY);
     }
     return objects.food[this.Math.getIndexWithHighestValue(temp)];
@@ -219,11 +245,14 @@ const aStar = new function () {
     }
     return obj;
   }
-  this.search = function(obj, map, direction) {
+  this.search = function(obj, map, direction, index) {
     this.update(obj, map);
     let objLocations = this.getAllObjectLocation();
     let nearestFoodCoordinate = this.getNearestFood(objLocations);
-    let foundPath = this.findPathFromTo(objLocations.head, nearestFoodCoordinate, direction);
-    return this.customProtos.translate(foundPath, objLocations.head);
+    let foundPath = this.findPathFromTo(
+      objLocations.head, nearestFoodCoordinate, direction, index, obj.score
+    );
+    this.checkAroundMoves(foundPath, nearestFoodCoordinate);
+    return this.proto.translate(foundPath, objLocations.head);
   }
 }
