@@ -31,6 +31,9 @@ const aStar = new function () {
                 ? Initial.WALL : obj.isFood 
                   ? Initial.FOOD : Initial.AIR
     }
+    this.getOpposite = function (direction) {
+      return direction === "w"? "s": direction === "s"? "w": direction === "a"? "d": direction === "d"? "a": void 0;
+    }
     this.getObjectArray = function(options, defaultValue) {
       return Object.assign({
         isWall: false,
@@ -57,7 +60,7 @@ const aStar = new function () {
     this.translate = function (instructions, startPos) {
       let keyPressOrder = [];
       let last = startPos;
-      for (let instruction of instructions || []) {
+      for (let instruction of instructions) {
         if (0 > last.row - instruction.row) { keyPressOrder.push("d"); }
         else if (0 < last.row - instruction.row) { keyPressOrder.push("a"); }
         else if (0 > last.column - instruction.column) { keyPressOrder.push("s"); }
@@ -83,6 +86,18 @@ const aStar = new function () {
       }
       return highest;
     }
+    this.getIndexWithLowestValue = function (array) {
+      let index = 0;
+      let lowest = 0;
+      // go through the array and pick the first index then compare
+      // the first and second value, if second is higher then pick second
+      while (index++ < array.length) {
+        if (array[lowest] < array[index]) {
+          lowest = index;
+        }
+      }
+      return lowest;
+    }
     this.heuristic = function (start, end) {
       let dx = Math.abs(end.row - start.row);
       let dy = Math.abs(end.column - start.column);
@@ -98,12 +113,16 @@ const aStar = new function () {
   }
   this.checkAroundMoves = function (foundPath, food) {
     let checkedArray = [];
-    for (let path of foundPath) {
-      for (let neighbour of this.getWalkableNeighbours(path)) {
-        this.proto.isSameCoordinate(neighbour, food);
+    outer: for (let path of foundPath) {
+      inner: for (let neighbour of this.getWalkableNeighbours(path)) {
+        if (this.proto.isSameCoordinate(neighbour, food)) {
+          checkedArray.push(neighbour);
+          break outer;
+        }
       }
+      checkedArray.push(path);
     }
-    return;
+    return checkedArray;
   }
   this.convertGridToArray = function (list, walls, foods) {
     let grid = [];
@@ -186,6 +205,7 @@ const aStar = new function () {
         }
       }
     }
+    // console.log([...walkableNodes]);
     return [...walkableNodes];
   }
   this.findPathFromTo = function (head, food, direction, index, score) {
@@ -194,9 +214,11 @@ const aStar = new function () {
     
     let currentNode;
     let totalLoop = 0;
+    let dfg;
     
     while (openNode.length) {
       currentNode = this.Math.getLowestCostTile(openNode, food);
+      currentNode.direction = direction;
       if (this.proto.isSameCoordinate(currentNode, food)) {
         console.log("PATH FOUND");
         let ret = [];
@@ -210,19 +232,23 @@ const aStar = new function () {
       }
       closedNode.push(...openNode.splice(openNode.indexOf(currentNode), 1));
       for (let neighbour of this.getWalkableNeighbours(currentNode, closedNode)) {
-        if (!currentNode.visited || -1 === openNode.indexOf(neighbour)) {
+        dfg = this.proto.getOpposite(this.proto.translate([neighbour], currentNode).join());
+        if (currentNode.direction === dfg) {
+          continue;
+        }
+        if (-1 === openNode.indexOf(neighbour)) {
           neighbour.parent = currentNode;
-          neighbour.visited = true;
+          neighbour.direction = this.proto.translate([neighbour], currentNode).join();
           openNode.push(neighbour);
         }
       }
+      // Safety Break please don't comment use it
       if (++totalLoop === 100) {
-        // this.proto.colourize(hasBeen, food);
         console.log("PATH NOT FOUND!");
         break;
       }
     }
-    return;
+    return [];
   }
   this.getNearestFood = function ( objects ) {
     let deltaX = null;
@@ -252,7 +278,7 @@ const aStar = new function () {
     let foundPath = this.findPathFromTo(
       objLocations.head, nearestFoodCoordinate, direction, index, obj.score
     );
-    this.checkAroundMoves(foundPath, nearestFoodCoordinate);
+    // let singleCheck = this.checkAroundMoves(foundPath, nearestFoodCoordinate);
     return this.proto.translate(foundPath, objLocations.head);
   }
 }
