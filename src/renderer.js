@@ -16,8 +16,8 @@ function update(loopIndex) {
   
   for (let [ index, food ] of currentSnake.foods.entries()) {
     if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
-      currentSnake.canvas
-          .parentNode.querySelector(".score").childNodes[0]
+      currentSnake.canvas.parentNode
+          .querySelector(".score").firstChild
           .textContent = "Score: " + ++currentSnake.score; 
   
       currentSnake.bodies.unshift({
@@ -36,26 +36,26 @@ function update(loopIndex) {
   gameBoard.drawFoods(currentSnake.foods, loopIndex);
   gameBoard.drawMapPart(gameBoard.moveSnake(currentSnake, loopIndex), loopIndex);
   
-  if (currentSnake.pressQueue.length) {
-    currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
-  }
-  
   if (!currentSnake.pressQueue.length) {
-    for (let move of makePrediction(currentSnake, currentSnake.direction, loopIndex)) {
+    for (let move of makePrediction(currentSnake, manager.wholeMap)) {
       currentSnake.pressQueue.push(pressHandler({ key: move }, currentSnake.direction));
     }
   }
+  currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
   // gameBoard.endGame(loopIndex);
 }
 
+function makePrediction(snakeObj, maps) {
+  return aStar.search(snakeObj, maps, snakeObj.direction) || [];
+}
+
 function eventHandlers() {
-  // document.body.addEventListener("keypress", pressHandler);
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
       for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
     }
     else if (event.key === "§") {
-      aStar.search(currentSnake, manager.wholeMap);
+      makePrediction(currentSnake, manager.wholeMap);
     }
   });
   document.querySelector("#trying").addEventListener("click", () => {
@@ -63,7 +63,7 @@ function eventHandlers() {
   });
 }
 
-const runOnLoad = () => {
+const runOnLoad = function () {
   manager.gameBoard = gameBoard = new boardProps(totalRowBoxes);
   snakes = manager.populate(gameBoard.canvas.length, snakeObjects, gameBoard);
   for (let snake of snakes) { manager.spawnFood(snake); }
@@ -71,13 +71,13 @@ const runOnLoad = () => {
   gameBoard.startGame();
 }
 
-const init = () => {
+// init when page done loading
+window.addEventListener("load", function () {
   if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 4); };
-  let parentElem = document.querySelector('[class="gameDiv"] > div');
+  
   manager = new boardManager();
-  manager.createGameGround(parentElem, localStorage.totalCanvas);
+  manager.createGameGround(document.querySelector(".gameDiv>div"), localStorage.totalCanvas);
+  
   eventHandlers();
   runOnLoad();
-}
-
-window.addEventListener("load", init, { once: true });
+}, { once: true });

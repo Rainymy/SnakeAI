@@ -86,7 +86,7 @@ function boardProps(boxes) {
     return { x: location.row * this.boxPixel, y: location.column * this.boxPixel }
   }
   this.container = [];
-  this.colourize = (position, visualize) => {
+  this.colourize = (position, visualize, speed) => {
     let location;
     if (position.hasOwnProperty("row")) {
       location = this.convertFromGridToPosition(position);
@@ -99,7 +99,7 @@ function boardProps(boxes) {
         }
         let curr = this.container.shift();
         this.drawSolidRect(curr.x, curr.y, 0, "white");
-      }, 250);
+      }, parseInt(speed) || 250);
     }
   }
   this.drawSqure = (x, y, index) => {

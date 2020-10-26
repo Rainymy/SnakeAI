@@ -2,10 +2,10 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'"> -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline'">
     <title>SnakeAI</title>
     <link rel="shortcut icon" type="image/x-icon" href="./favicon.png">
-    <!-- <script src="https:\/\/unpkg.com/ml5@0.4.3/dist/ml5.min.js"></script> -->
     <link rel="stylesheet" href="./src/index.css">
   </head>
   <body>
@@ -48,20 +48,14 @@
             <!-- Canvas dynamically adds here -->
           </div>
         </div>
-        <div class="bottom">
-          <button class="btn" >Random</button>
-          <button class="btn" >load</button>
-          <button class="btn" >save</button>
-        </div>
+        <div class="bottom"></div>
       </div>
     </div>
   </body>
-  <!-- <script defer type="text/javascript"> console.log(ml5); </script> -->
-  <script defer src="./src/brain.js" charset="utf-8"></script>
   <script defer src="./src/objects/boardManager.js" charset="utf-8"></script>
   <script defer src="./src/objects/boardObject.js" charset="utf-8"></script>
   <script defer src="./src/objects/snakeObject.js" charset="utf-8"></script>
-  <script defer src="./src/differentFunctiones/pathFinding.js" charset="utf-8"></script>
-  <script defer src="./src/differentFunctiones/keyPressHandler.js" charset="utf-8"></script>
+  <script defer src="./src/pathFinding.js" charset="utf-8"></script>
+  <script defer src="./src/keyPressHandler.js" charset="utf-8"></script>
   <script defer src="./src/renderer.js" charset="utf-8"></script>
 </html>

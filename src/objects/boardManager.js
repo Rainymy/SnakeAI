@@ -53,13 +53,15 @@ function boardManager() {
     return wholeMap;
   }
   /*------------------ Spawn Food --------------------*/
-  this.spawnFood = function (snake, total=2) {
+  this.spawnFood = function (snake, total=1) {
     let location = null;
     for (let i = 0; i < total; i++) {
       location = this.getRandomAvailableLocation(snake.bodies);
       snake.foods.push({
         x: location.x,
         y: location.y
+        // x: snake.bodies[0].x + this.gameBoard.boxPixel * 0,
+        // y: snake.bodies[0].y + this.gameBoard.boxPixel * 4
       });
     }
   }

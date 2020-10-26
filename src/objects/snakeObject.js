@@ -1,6 +1,7 @@
 function snakeObjects(boxSize, totalBoxes, canvas) {
   this.getRandomLocation = function () {
-    return Math.floor(Math.random() * totalBoxes) * boxSize;
+    // return Math.floor(Math.random() * totalBoxes) * boxSize;
+    return Math.floor(0.5 * totalBoxes) * boxSize;
   }
   this.getRandomColor = function () {
     return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
@@ -26,4 +27,5 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
   ];
   this.foods = [];
   this.direction = { x: 0, y: 0, letter: null };
+  // this.direction = { x: -1, y: 0, letter: "w" };
 }
