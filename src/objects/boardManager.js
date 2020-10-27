@@ -15,13 +15,12 @@ function boardManager() {
     }
     return players;
   }
-  this.restart = function (snakes, snakeObj, board) {
+  this.reInit = function (snakes, snakeObj, board) {
     let newSnake = this.populate(snakes.length, snakeObj, board);
     snakes.length = 0;
     snakes.push(...newSnake);
     for (let loopId of board.loopIds) { board.endGame(loopId); }
     this.resetScore();
-    runOnLoad();
   }
   /*---------------------- Map ------------------------*/
   this.getRandomAvailableLocation = function (bodies, size) {
@@ -58,10 +57,10 @@ function boardManager() {
     for (let i = 0; i < total; i++) {
       location = this.getRandomAvailableLocation(snake.bodies);
       snake.foods.push({
-        x: location.x,
-        y: location.y
-        // x: snake.bodies[0].x + this.gameBoard.boxPixel * 0,
-        // y: snake.bodies[0].y + this.gameBoard.boxPixel * 4
+        // x: location.x,
+        // y: location.y
+        x: snake.bodies[0].x + this.gameBoard.boxPixel * 0,
+        y: snake.bodies[0].y + this.gameBoard.boxPixel * 4
       });
     }
   }

@@ -40,7 +40,7 @@ function boardProps(boxes) {
       // if body has invisbale property
       if (i === 0 || body.invisible) { continue; }
       // if head crashed with body part
-      if (bodies.length >= 3 && body.x === bodies[0].x  && body.y === bodies[0].y) {
+      if (body.x === bodies[0].x  && body.y === bodies[0].y) {
         return true;
       }
     }

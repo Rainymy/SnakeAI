@@ -12,6 +12,7 @@ function update(loopIndex) {
   if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
     gameBoard.endGame(loopIndex);
     currentSnake.canvas.parentNode.querySelector("#gameEnded").style.display = "";
+    return;
   }
   
   for (let [ index, food ] of currentSnake.foods.entries()) {
@@ -25,41 +26,49 @@ function update(loopIndex) {
         y: currentSnake.bodies[0].y,
         invisible: false
       });
-      let newFood = manager.getRandomAvailableLocation(currentSnake.bodies, gameBoard.boxSize);
+      let newFood = manager.getRandomAvailableLocation(
+        currentSnake.bodies, gameBoard.boxSize
+      );
       currentSnake.foods.splice(index, 1, {
         x: newFood.x,
         y: newFood.y
       });
     }
   }
+  
   gameBoard.character(currentSnake.bodies, loopIndex);
   gameBoard.drawFoods(currentSnake.foods, loopIndex);
   gameBoard.drawMapPart(gameBoard.moveSnake(currentSnake, loopIndex), loopIndex);
   
   if (!currentSnake.pressQueue.length) {
-    for (let move of makePrediction(currentSnake, manager.wholeMap)) {
-      currentSnake.pressQueue.push(pressHandler({ key: move }, currentSnake.direction));
+    for (let move of aStar.search(currentSnake, manager.wholeMap)) {
+      currentSnake.pressQueue.push(
+        pressHandler({ key: move }, currentSnake.direction)
+      );
     }
   }
   currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
+  
   // gameBoard.endGame(loopIndex);
-}
-
-function makePrediction(snakeObj, maps) {
-  return aStar.search(snakeObj, maps, snakeObj.direction) || [];
+  
+  // TODO: 
+  // 1. Disallow move backword
+  // 2. Remove this snakes invisible body
+  // 3. Recreate this update function (cuz it is trash)
 }
 
 function eventHandlers() {
   document.body.addEventListener("keyup", (event) => {
     if (event.key === "Escape") {
-      for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
+      for (let loop of gameBoard.loopIds) { gameBoard.endGame(loop); }
     }
     else if (event.key === "§") {
-      makePrediction(currentSnake, manager.wholeMap);
+      aStar.search(currentSnake, manager.wholeMap);
     }
   });
   document.querySelector("#trying").addEventListener("click", () => {
-    manager.restart(snakes, snakeObjects, gameBoard);
+    manager.reInit(snakes, snakeObjects, gameBoard);
+    runOnLoad();
   });
 }
 
@@ -70,14 +79,3 @@ const runOnLoad = function () {
   
   gameBoard.startGame();
 }
-
-// init when page done loading
-window.addEventListener("load", function () {
-  if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 4); };
-  
-  manager = new boardManager();
-  manager.createGameGround(document.querySelector(".gameDiv>div"), localStorage.totalCanvas);
-  
-  eventHandlers();
-  runOnLoad();
-}, { once: true });
