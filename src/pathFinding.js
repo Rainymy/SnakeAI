@@ -7,12 +7,10 @@ const aStar = {
   },
   
   mapGrid: null,
-  mapArrayWithPosition: null,
+  mapArray: null,
   
   proto: {
-    lastElement: function (array) {
-      return array[array.length - 1];
-    },
+    init: false ,
     isSameCoordinate: function (startPos, endPos) {
       if (!endPos || !startPos) {
         console.error("Missing end/start position"); 
@@ -26,12 +24,61 @@ const aStar = {
       
       return startX === endX && startY === endY;
     },
+    compareValues: function (firstValue, array) {
+      if (firstValue == undefined) { return false; }
+      for (let value of array) { if (firstValue === value) { return true; }}
+      return false;
+    },
+    colourize: function (array, flag) {
+      for (let [i, per] of array.entries()) {
+        gameBoard.colourize(per,i === array.length - 1 ?true: false, flag && flag.speed);
+      }
+    },
+    convertGridToArray: function (list, walls, foods) {
+      let grid = [];
+      let last = null;
+      outer: for (let current of list) {
+        if (!last || current.x !== last.x) {
+          last = current;
+          grid.push([]);
+        }
+        for (let food of foods) {
+          if (food.x === current.x && food.y === current.y) {
+            this.lastElement(grid).push(this.getObjectArray({ isFood: true }, current));
+            continue outer;
+          }
+        }
+        for (let [j, wall] of walls.entries()) {
+          if (j !== 0 && this.isSameCoordinate(wall, current)) {
+            this.lastElement(grid).push(
+              this.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
+            );
+            continue outer;
+          }
+        }
+        this.lastElement(grid).push(this.getObjectArray(current));
+      }
+      return grid;
+    },
+    createGridFromArray: function(lists) {
+      let grid = [], last;
+      for (let current of lists) {
+        for (let obj of current) {
+          if (!last || last.x !== obj.x) {
+            last = obj;
+            grid.push([]);
+          }
+          this.lastElement(grid).push(this.getInitialValues(obj));
+        }
+      }
+      return grid;
+    },
     getOpposite: function (direction) {
       return direction === "w"
-              ? "s" : direction === "s"
-                ? "w" : direction === "a"
-                  ? "d" : direction === "d"
-                    ? "a" : undefined;
+      ? "s" : direction === "s"
+      ? "w" : direction === "a"
+      ? "d" : direction === "d"
+      ? "a" : undefined;
     },
     getObjectArray: function(options, defaultValue) {
       return Object.assign({
@@ -40,16 +87,32 @@ const aStar = {
         isHead: false
       }, options, defaultValue);
     },
-    colourize: function (array, flag) {
-      let copy = array.slice();
-      for (let [i, per] of copy.entries()) {
-        gameBoard.colourize(per,i === copy.length - 1 ? true: false, flag && flag.speed);
-      }
+    getInitialValues: function (obj) {
+      return obj.isHead 
+              ? this.parent.Initial.HEAD : obj.isWall 
+                ? this.parent.Initial.WALL : obj.isFood 
+                  ? this.parent.Initial.FOOD : this.parent.Initial.AIR
     },
-    compareValues: function (firstValue, array) {
-      if (firstValue == undefined) { return false; }
-      for (let value of array) { if (firstValue === value) { return true; }}
-      return false;
+    getNearestFood: function ( objects ) {
+      let temp = [];
+      for (let food of objects.food) {
+        temp.push(this.parent.Math.heuristic(food, objects.head));
+      }
+      return objects.food[this.parent.Math.getIndexWithLowestValue(temp)];
+    },
+    getAllObjectLocation: function (direction) {
+      let obj = { head: [], food: [] };
+      for (let [i, x] of this.parent.mapGrid.entries()) {
+        for (let [j, y] of x.entries()) {
+          if (y === this.parent.Initial.HEAD) {
+            obj.head = { row: i, column: j, direction: direction.letter };
+          }
+          else if (y === this.parent.Initial.FOOD) {
+            obj.food.push({ row: i, column: j });
+          }
+        }
+      }
+      return obj;
     },
     translate: function (instructions, startPos) {
       let keyPressOrder = [];
@@ -62,6 +125,9 @@ const aStar = {
         last = instruction;
       }
       return keyPressOrder;
+    },
+    lastElement: function (array) {
+      return array[array.length - 1];
     }
   },
   Math: {
@@ -71,13 +137,13 @@ const aStar = {
     getIndexWithLowestValue: function (array) {
       let index = 0;
       let lowest = 0;
-      // go through the array and pick the first index then compare
-      // the first and second value, if second is lower then pick second
+      
       while (index++ < array.length) {
         if (array[lowest] > array[index]) {
           lowest = index;
         }
       }
+      
       return lowest;
     },
     getLowestCostTile: function (array, endPos) {
@@ -87,53 +153,6 @@ const aStar = {
       }
       return array[this.getIndexWithLowestValue(temp)];
     }
-  },
-  getInitialValues: function (obj) {
-    return obj.isHead 
-            ? this.Initial.HEAD : obj.isWall 
-              ? this.Initial.WALL : obj.isFood 
-                ? this.Initial.FOOD : this.Initial.AIR
-  },
-  convertGridToArray: function (list, walls, foods) {
-    let grid = [];
-    let last = null;
-    outer: for (let current of list) {
-      if (!last || current.x !== last.x) {
-        last = current;
-        grid.push([]);
-      }
-      for (let food of foods) {
-        if (food.x === current.x && food.y === current.y) {
-          this.proto.lastElement(grid).push(this.proto.getObjectArray({
-            isFood: true
-          }, current));
-          continue outer;
-        }
-      }
-      for (let [j, wall] of walls.entries()) {
-        if (j !== 0 && this.proto.isSameCoordinate(wall, current)) {
-          this.proto.lastElement(grid).push(
-            this.proto.getObjectArray(j === 1 ? {isHead: true}: {isWall: true}, current)
-          );
-          continue outer;
-        }
-      }
-      this.proto.lastElement(grid).push(this.proto.getObjectArray(current));
-    }
-    return grid;
-  },
-  createGridFromArray: function(lists) {
-    let grid = [], last;
-    for (let current of lists) {
-      for (let obj of current) {
-        if (!last || last.x !== obj.x) {
-          last = obj;
-          grid.push([]);
-        }
-        this.proto.lastElement(grid).push(this.getInitialValues(obj));
-      }
-    }
-    return grid;
   },
   getWalkableNeighbours: function (head, walked) {
     walked = walked || [];
@@ -178,7 +197,7 @@ const aStar = {
     
     let currentNode;
     let totalLoop = 0;
-    let dfg;
+    let direction;
     
     while (openNode.length) {
       currentNode = this.Math.getLowestCostTile(openNode, food);
@@ -186,7 +205,6 @@ const aStar = {
       if (this.proto.isSameCoordinate(currentNode, food)) {
         console.log("PATH FOUND");
         let ret = [];
-        let copy;
         let curr = currentNode;
         while (curr.parent) {
           ret.push(curr); 
@@ -197,11 +215,11 @@ const aStar = {
       }
       closedNode.push(...openNode.splice(openNode.indexOf(currentNode), 1));
       for (let neighbour of this.getWalkableNeighbours(currentNode, closedNode)) {
-        dfg = this.proto.getOpposite(this.proto.translate([neighbour], currentNode)[0]);
-        if (currentNode.direction === dfg) { continue; }
+        direction = this.proto.translate([neighbour], currentNode)[0];
+        if (currentNode.direction === this.proto.getOpposite(direction)) { continue; }
         if (-1 === openNode.indexOf(neighbour)) {
           neighbour.parent = currentNode;
-          neighbour.direction = this.proto.translate([neighbour], currentNode).join();
+          neighbour.direction = direction;
           openNode.push(neighbour);
         }
       }
@@ -214,35 +232,20 @@ const aStar = {
     }
     return [];
   },
-  getNearestFood: function ( objects ) {
-    let temp = [];
-    for (let food of objects.food) {
-      temp.push(this.Math.heuristic(food, objects.head));
-    }
-    return objects.food[this.Math.getIndexWithLowestValue(temp)];
-  },
-  getAllObjectLocation: function (direction) {
-    let obj = { head: [], food: [] };
-    for (let [i, x] of this.mapGrid.entries()) {
-      for (let [j, y] of x.entries()) {
-        if (y === this.Initial.HEAD) {
-          obj.head = { row: i, column: j, direction: direction.letter };
-        }
-        else if (y === this.Initial.FOOD) {
-          obj.food.push({ row: i, column: j });
-        }
-      }
-    }
-    return obj;
-  },
   search: function (obj, map) {
-    this.mapArrayWithPosition = this.convertGridToArray(map, obj.bodies, obj.foods);
-    this.mapGrid = this.createGridFromArray(this.mapArrayWithPosition);
+    if (!this.proto.init) {
+      this.proto.parent = this;
+      this.proto.init = true;
+    }
     
-    let objLocations = this.getAllObjectLocation(obj.direction);
-    let nearestFoodCoordinate = this.getNearestFood(objLocations);
-    let foundPath = this.findPathFromTo(objLocations.head, nearestFoodCoordinate);
-    console.log(objLocations);
+    this.mapArray = this.proto.convertGridToArray(map, obj.bodies,obj.foods);
+    this.mapGrid = this.proto.createGridFromArray(this.mapArray);
+    
+    let objLocations = this.proto.getAllObjectLocation(obj.direction);
+    let foundPath = this.findPathFromTo(
+      objLocations.head, this.proto.getNearestFood(objLocations)
+    );
+    // console.log(objLocations);
     return this.proto.translate(foundPath, objLocations.head);
   }
 }
