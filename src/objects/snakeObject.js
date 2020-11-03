@@ -26,6 +26,6 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
     }
   ];
   this.foods = [];
-  // this.direction = { x: 0, y: 0, letter: null };
-  this.direction = { x: -1, y: 0, letter: "w" };
+  this.direction = { x: 0, y: 0, letter: null };
+  // this.direction = { x: -1, y: 0, letter: "w" };
 }
