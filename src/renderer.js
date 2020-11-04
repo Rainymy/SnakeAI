@@ -47,6 +47,29 @@ function update(loopIndex) {
       );
     }
   }
+  
+  // When snake gets near the walls. Activates with threshold
+  // for (let boarder of manager.boarders) {
+  //   if (boarder.hasOwnProperty("width")) {
+  //     console.log("For X");
+  //     if (
+  //       (boarder.width - currentSnake.bodies[0].x) / gameBoard.boxPixel === currentSnake.threshold ||
+  //       (currentSnake.bodies[0].x / gameBoard.boxPixel) === currentSnake.threshold - 1
+  //     ) {
+  //       gameBoard.endGame(loopIndex);
+  //     }
+  //   }
+  //   else {
+  //     console.log("For Y");
+  //     if (
+  //       (boarder.height - currentSnake.bodies[0].y) / gameBoard.boxPixel === currentSnake.threshold ||
+  //       (currentSnake.bodies[0].y / gameBoard.boxPixel) === currentSnake.threshold - 1
+  //     ) {
+  //       gameBoard.endGame(loopIndex);
+  //     }
+  //   }
+  // }
+  
   currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
   
   // gameBoard.endGame(loopIndex);

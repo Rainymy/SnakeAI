@@ -1,6 +1,7 @@
 function boardManager() {
   this.gameBoard = null;
   this.wholeMap = null;
+  this.boarders = [];
   this.boardIds = [];
   /*-------------------- General ----------------------*/
   this.createUniqueId = function () {
@@ -49,6 +50,13 @@ function boardManager() {
         });
       }
     }
+    // HARD coded part, please replace it 
+    // START - Side effect
+    let temp = wholeMap[this.gameBoard.totalBoxes - 1].y + this.gameBoard.boxPixel;
+    for (let i = 0; i < 2; i++) {
+      this.boarders.push(i % 2 === 0 ? { width: temp, start: 0 }: { height: temp,  start: 0 });
+    }
+    // END
     return wholeMap;
   }
   /*------------------ Spawn Food --------------------*/

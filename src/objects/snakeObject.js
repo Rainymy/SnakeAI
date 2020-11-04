@@ -9,6 +9,7 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
   this.x = this.getRandomLocation();
   this.y = this.getRandomLocation();
   this.color = this.getRandomColor();
+  this.threshold = 1;
   this.score = 0;
   this.frames = 0;
   this.canvas = canvas;
