@@ -226,7 +226,7 @@ const aStar = {
       // Safety Break, do not comment this
       if (++totalLoop === 200) {
         console.log("PATH NOT FOUND!");
-        this.proto.colourize(closedNode, { speed: 50 });
+        // this.proto.colourize(closedNode, { speed: 50 });
         break;
       }
     }

@@ -41,10 +41,75 @@ function boardProps(boxes) {
       if (i === 0 || body.invisible) { continue; }
       // if head crashed with body part
       if (body.x === bodies[0].x  && body.y === bodies[0].y) {
+        console.log("Suicide");
         return true;
       }
     }
     return false;
+  }
+  this.checkNearBorder = function (borders, currentSnake, threshold) {
+    let head = currentSnake.bodies[0];
+    let nextDirection = currentSnake.pressQueue[0];
+    let direction = currentSnake.pressQueue[0] && currentSnake.pressQueue[0].letter;
+    
+    for (let border of borders) {
+      if (border.hasOwnProperty("width")) {
+        if ((border.width - head.x) / this.boxPixel === threshold) {
+          if (nextDirection && direction === "d" || !nextDirection) {
+            currentSnake.pressQueue.length = 0;
+            if (border.width / 2 < head.y) {
+              console.log("Go Up");
+              currentSnake.pressQueue.push({ x: 0, y: -1, letter: "w" });
+            }
+            else {
+              console.log("Go Down");
+              currentSnake.pressQueue.push({ x: 0, y: 1, letter: "s" });
+            }
+          }
+        }
+        if ((head.x / this.boxPixel) === threshold - 1) {
+          if (nextDirection && direction === "a" || !nextDirection) {
+            currentSnake.pressQueue.length = 0;
+            if (border.width / 2 < head.y) {
+              console.log("Go Up");
+              currentSnake.pressQueue.push({ x: 0, y: -1, letter: "w" });
+            }
+            else {
+              console.log("Go Down");
+              currentSnake.pressQueue.push({ x: 0, y: 1, letter: "s" });
+            }
+          }
+        }
+      }
+      else {
+        if ((border.height - head.y)/ this.boxPixel === threshold) {
+          if (nextDirection && direction === "s" || !nextDirection) {
+            currentSnake.pressQueue.length = 0;
+            if (border.height / 2 < head.x) {
+              console.log("Go Left");
+              currentSnake.pressQueue.push({ x: -1, y: 0, letter: "a" });
+            }
+            else {
+              console.log("Go Right");
+              currentSnake.pressQueue.push({ x: 1, y: 0, letter: "d" });
+            }
+          }
+        }
+        if ((head.y / this.boxPixel) === threshold - 1) {
+          if (nextDirection && direction === "w" || !nextDirection) {
+            currentSnake.pressQueue.length = 0;
+            if (border.height / 2 < head.x) {
+              console.log("Go Left");
+              currentSnake.pressQueue.push({ x: -1, y: 0, letter: "a" });
+            }
+            else {
+              console.log("Go Right");
+              currentSnake.pressQueue.push({ x: 1, y: 0, letter: "d" });
+            }
+          }
+        }
+      }
+    }
   }
   // Entities/Structure
   this.clearScreen = (loopObj) => {
