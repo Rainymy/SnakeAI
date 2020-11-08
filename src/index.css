@@ -28,6 +28,9 @@ canvas {
   font-weight: bold;
   margin: 0 -5px;
 }
+.d-inline-block {
+  display: inline-block;
+}
 
 /* wrappers */
 .wrapper {

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'">
-    <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="style-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
     <title>SnakeAI</title>
     <link rel="shortcut icon" type="image/x-icon" href="./favicon.png">
     <link rel="stylesheet" href="./src/index.css">
@@ -12,39 +11,23 @@
     <div class="wrapper">
       <div class="game-board">
         <div class="game-button-div">
-          <div class="snake-status" style="display: inline-block">
+          <div class="snake-status d-inline-block">
             <span>Score:</span>
             <span id="score">0</span>
           </div>
-          <button class="btn" >buttons</button>
           <button id="trying" class="btn" >Restart</button>
-          <button class="btn" >
+          <button class="btn" onclick="localStorage.clear();">
             <b>Clear localStorage</b>
-            <script defer type="text/javascript">
-              document.currentScript.parentNode.onclick = (event) => {
-                localStorage.clear();
-              }
-            </script>
           </button>
-          <div style="display: inline-block">
+          <div class="d-inline-block">
             <input type="search">
-            <button class="btn">
+            <button class="btn" onclick="changeTotalGame(this)">
               <b>Change</b>
-              <script type="text/javascript">
-                let selected = document.currentScript.parentNode;
-                selected.onclick = function () {
-                  let number = parseInt(selected.previousElementSibling.value);
-                  if (Number.isNaN(number) !== true) {
-                    localStorage.setItem("totalCanvas", number);
-                    location.reload();
-                  }
-                }
-              </script>
             </button>
           </div>
         </div>
         <div class="gameDiv">
-          <div class="">
+          <div>
             <!-- Canvas dynamically adds here -->
           </div>
         </div>
@@ -59,9 +42,20 @@
   <script defer src="./src/keyPressHandler.js" charset="utf-8"></script>
   <script defer src="./src/renderer.js" charset="utf-8"></script>
   <script defer type="text/javascript" charset="utf-8">
+  
+    function changeTotalGame(event) {
+      let number = Math.floor(parseInt(event.previousElementSibling.value));
+      if (!Number.isNaN(number) && 1 <= number) {
+        localStorage.setItem("totalCanvas", number);
+        location.reload();
+      }
+    }
+  
     // init when page done loading
     window.addEventListener("load", () => {
-      if (!localStorage.getItem("totalCanvas")) { localStorage.setItem("totalCanvas", 4); };
+      if (!localStorage.getItem("totalCanvas")) {
+        localStorage.setItem("totalCanvas", 4);
+      };
       
       manager = new boardManager();
       manager.createGameGround(

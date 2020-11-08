@@ -49,7 +49,7 @@ function boardProps(boxes) {
   }
   this.checkNearBorder = function (borders, currentSnake, threshold) {
     let head = currentSnake.bodies[0];
-    let nextDirection = currentSnake.pressQueue[0];
+    let nextDirection = currentSnake.pressQueue[1];
     let direction = currentSnake.pressQueue[0] && currentSnake.pressQueue[0].letter;
     
     for (let border of borders) {

@@ -1,4 +1,4 @@
-let totalRowBoxes = 14;
+let totalRowBoxes = 10;
 let gameBoard;
 let snakes = [];
 let manager = null;
@@ -51,7 +51,7 @@ function update(loopIndex) {
   // When snake gets near the walls. Activates with threshold
   gameBoard.checkNearBorder(manager.boarders, currentSnake, currentSnake.threshold);
   
-  currentSnake.direction = currentSnake.pressQueue.shift() || currentSnake.direction;
+  currentSnake.direction = currentSnake.getNextDirection();
   
   // gameBoard.endGame(loopIndex);
   
