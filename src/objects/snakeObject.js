@@ -15,18 +15,10 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
     return direction || this.direction;
   }
   this.getOpposite = function (direction) {
-    if (direction.letter === "w") {
-      return { x: 0, y: 1, letter: "s" };
-    }
-    if (direction.letter === "s") {
-      return { x: 0, y: -1, letter: "w" };
-    }
-    if (direction.letter === "a") {
-      return { x: 1, y: 0, letter: "d" };
-    }
-    if (direction.letter === "d") {
-      return { x: -1, y: 0, letter: "a" };
-    }
+    if (direction.letter === "w") return { x: 0, y: 1, letter: "s" };
+    if (direction.letter === "s") return { x: 0, y: -1, letter: "w" };
+    if (direction.letter === "a") return { x: 1, y: 0, letter: "d" };
+    if (direction.letter === "d") return { x: -1, y: 0, letter: "a" };
     return [];
   }
   this.getRandomColor = function () {

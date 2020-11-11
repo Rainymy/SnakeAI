@@ -1,32 +1,38 @@
 function boardProps(boxes) {
   // Genenal
   this.canvas = document.getElementsByTagName('canvas');
-  this.ctx = (() => {
+  this.ctx = (function() {
+    this.canvas = document.getElementsByTagName('canvas');
     let ctx = [];
-    for (let context of this.canvas) { ctx.push(context.getContext('2d')); }
+    for (let context of this.canvas) {
+      ctx.push(context.getContext('2d'));
+    }
     return ctx;
   })();
   this.totalBoxes = Math.floor(boxes) || 10;
   this.boxPixel = Math.round(this.canvas[0].width / this.totalBoxes);
   // Game logices
   this.loopIds = [];
-  this.totalLeft = 0;
-  this.startGame = function () {
+  this.sleepFor = function (delay) {
+    return new Promise(function (resolve, reject) {
+      return setTimeout(resolve, delay);
+    });
+  }
+  this.startGame = async function () {
     for (let loop of this.loopIds) { clearInterval(loop.intervalId); }
     for (let i = 0; i < this.canvas.length; i++) {
       this.loopIds.push({
         intervalId: setInterval(this.runAgain, 120, i),
         index: i
       });
+      await this.sleepFor(200);
     }
-    this.totalLeft = this.canvas.length;
   }
   this.runAgain = (index) => {
-    update(this.loopIds[index]);
+    return update(this.loopIds[index]);
   }
   this.endGame = function (loopObj) {
-    clearInterval(loopObj.intervalId);
-    this.totalLeft--;
+    return clearInterval(loopObj.intervalId);
   }
   this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {
@@ -86,11 +92,11 @@ function boardProps(boxes) {
           if (nextDirection && direction === "s" || !nextDirection) {
             currentSnake.pressQueue.length = 0;
             if (border.height / 2 < head.x) {
-              console.log("Go Left");
+              console.log("Go Right");
               currentSnake.pressQueue.push({ x: -1, y: 0, letter: "a" });
             }
             else {
-              console.log("Go Right");
+              console.log("Go Left");
               currentSnake.pressQueue.push({ x: 1, y: 0, letter: "d" });
             }
           }

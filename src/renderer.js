@@ -56,9 +56,7 @@ function update(loopIndex) {
   // gameBoard.endGame(loopIndex);
   
   // TODO: 
-  // 1. Disallow move backword
-  // 2. Remove this snakes invisible body
-  // 3. Recreate this update function (cuz it is trash)
+  // 1. Remove this snakes invisible body
 }
 
 function eventHandlers() {
