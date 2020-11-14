@@ -26,7 +26,6 @@ canvas {
   left: 50%;
   transform: translate(-50%, 100%);
   font-weight: bold;
-  margin: 0 -5px;
 }
 .d-inline-block {
   display: inline-block;

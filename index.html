@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Security-Policy" content="style-src 'self'">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy"content="script-src 'self' 'unsafe-inline'">
     <title>SnakeAI</title>
     <link rel="shortcut icon" type="image/x-icon" href="./favicon.png">
     <link rel="stylesheet" href="./src/index.css">
@@ -39,7 +39,6 @@
   <script defer src="./src/objects/boardObject.js" charset="utf-8"></script>
   <script defer src="./src/objects/snakeObject.js" charset="utf-8"></script>
   <script defer src="./src/pathFinding.js" charset="utf-8"></script>
-  <script defer src="./src/keyPressHandler.js" charset="utf-8"></script>
   <script defer src="./src/renderer.js" charset="utf-8"></script>
   <script defer type="text/javascript" charset="utf-8">
   
@@ -53,9 +52,7 @@
   
     // init when page done loading
     window.addEventListener("load", () => {
-      if (!localStorage.getItem("totalCanvas")) {
-        localStorage.setItem("totalCanvas", 4);
-      };
+      if (!localStorage.getItem("totalCanvas")) localStorage.setItem("totalCanvas", 4);
       
       manager = new boardManager();
       manager.createGameGround(

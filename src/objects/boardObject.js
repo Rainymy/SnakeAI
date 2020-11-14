@@ -1,8 +1,7 @@
 function boardProps(boxes) {
   // Genenal
   this.canvas = document.getElementsByTagName('canvas');
-  this.ctx = (function() {
-    this.canvas = document.getElementsByTagName('canvas');
+  this.ctx = (() => {
     let ctx = [];
     for (let context of this.canvas) {
       ctx.push(context.getContext('2d'));
@@ -13,20 +12,15 @@ function boardProps(boxes) {
   this.boxPixel = Math.round(this.canvas[0].width / this.totalBoxes);
   // Game logices
   this.loopIds = [];
-  this.sleepFor = function (delay) {
-    return new Promise(function (resolve, reject) {
-      return setTimeout(resolve, delay);
-    });
-  }
-  this.startGame = async function () {
+  this.startGame = function () {
     for (let loop of this.loopIds) { clearInterval(loop.intervalId); }
     for (let i = 0; i < this.canvas.length; i++) {
       this.loopIds.push({
         intervalId: setInterval(this.runAgain, 120, i),
         index: i
       });
-      await this.sleepFor(200);
     }
+    return this;
   }
   this.runAgain = (index) => {
     return update(this.loopIds[index]);
@@ -126,19 +120,6 @@ function boardProps(boxes) {
     let context = this.canvas[loopObj.index];
     context.getContext('2d').clearRect(x, y, this.boxPixel, this.boxPixel);
   }
-  this.moveSnake = function (obj, loopObj) {
-    let body = obj.bodies;
-    body.unshift({
-      x: body[0].x + obj.direction.x * this.boxPixel,
-      y: body[0].y + obj.direction.y * this.boxPixel,
-      invisible: false
-    });
-    let last = body.pop();
-    body[body.length - 1].invisible = true;
-    
-    return obj.direction.x === 0 && obj.direction.y === 0 
-              ? [{ x: -this.boxPixel, y: -this.boxPixel }] : [last]
-  }
   this.drawSolidRect = (x, y, index, colour) => {
     let context = this.ctx[index];
     context.beginPath();
@@ -192,7 +173,6 @@ function boardProps(boxes) {
     for (let [index, part] of parts.entries()) {
       this.clearPixel(part.x, part.y, loopObj);
       this.drawSqure(part.x ,part.y, loopObj.index);
-      // parts.splice(index, 1);
     }
   }
 }

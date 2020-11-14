@@ -1,50 +1,36 @@
-let totalRowBoxes = 10;
+let totalRowBoxes = 18;
 let gameBoard;
 let snakes = [];
 let manager = null;
 let currentSnake = null;
 
 function update(loopIndex) {
-  currentSnake = snakes[loopIndex.index];
-  currentSnake.frames++;
-  console.log(`Snake: %c${currentSnake.frames}`, `color: ${currentSnake.color}`);
+  let { bodies, foods, canvas, color, score } = currentSnake = snakes[loopIndex.index];
+  console.log(`Snake: %c${++currentSnake.frames}`, `color: ${color}`);
   
-  if (gameBoard.isGameEnded(currentSnake.bodies, loopIndex)) {
-    gameBoard.endGame(loopIndex);
-    currentSnake.canvas.parentNode.querySelector("#gameEnded").style.display = "";
-    return;
+  if (gameBoard.isGameEnded(bodies, loopIndex)) {
+    canvas.parentNode.querySelector("#gameEnded").style.display = "";
+    return gameBoard.endGame(loopIndex);
   }
   
-  for (let [ index, food ] of currentSnake.foods.entries()) {
-    if (food.x === currentSnake.bodies[0].x && food.y === currentSnake.bodies[0].y) {
-      currentSnake.canvas.parentNode
-          .querySelector(".score").firstChild
-          .textContent = "Score: " + ++currentSnake.score; 
-  
-      currentSnake.bodies.unshift({
-        x: currentSnake.bodies[0].x,
-        y: currentSnake.bodies[0].y,
-        invisible: false
-      });
-      let newFood = manager.getRandomAvailableLocation(
-        currentSnake.bodies, gameBoard.boxSize
-      );
-      currentSnake.foods.splice(index, 1, {
-        x: newFood.x,
-        y: newFood.y
-      });
+  for (let [ index, food ] of foods.entries()) {
+    if (food.x === bodies[0].x && food.y === bodies[0].y) {
+      canvas.parentNode.querySelector(".score").firstChild
+          .textContent = `Score: ${++currentSnake.score}`;
+      
+      bodies.unshift({ x: bodies[0].x, y: bodies[0].y, invisible: false });
+      let newFood = manager.getRandomAvailableLocation(bodies, gameBoard.boxSize);
+      foods.splice(index, 1, { x: newFood.x, y: newFood.y });
     }
   }
   
-  gameBoard.character(currentSnake.bodies, loopIndex);
-  gameBoard.drawFoods(currentSnake.foods, loopIndex);
-  gameBoard.drawMapPart(gameBoard.moveSnake(currentSnake, loopIndex), loopIndex);
+  gameBoard.character(bodies, loopIndex);
+  gameBoard.drawFoods(foods, loopIndex);
+  gameBoard.drawMapPart(currentSnake.moveSnake(), loopIndex);
   
   if (!currentSnake.pressQueue.length) {
-    for (let move of aStar.search(currentSnake, manager.wholeMap)) {
-      currentSnake.pressQueue.push(
-        pressHandler({ key: move }, currentSnake.direction)
-      );
+    for (let move of aStar.search(currentSnake, manager.wholeMap, totalRowBoxes)) {
+      currentSnake.pressQueue.push(currentSnake.pressHandler( move ));
     }
   }
   
@@ -52,32 +38,25 @@ function update(loopIndex) {
   gameBoard.checkNearBorder(manager.boarders, currentSnake, currentSnake.threshold);
   
   currentSnake.direction = currentSnake.getNextDirection();
-  
-  // gameBoard.endGame(loopIndex);
-  
-  // TODO: 
-  // 1. Remove this snakes invisible body
 }
 
 function eventHandlers() {
-  document.body.addEventListener("keyup", (event) => {
+  document.body.addEventListener("keyup", function (event) {
     if (event.key === "Escape") {
-      for (let loop of gameBoard.loopIds) { gameBoard.endGame(loop); }
+      for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
     }
-    else if (event.key === "§") {
-      aStar.search(currentSnake, manager.wholeMap);
-    }
+    else if (event.key === "§") aStar.search(currentSnake, manager.wholeMap);
   });
-  document.querySelector("#trying").addEventListener("click", () => {
-    manager.reInit(snakes, snakeObjects, gameBoard);
+  document.querySelector("#trying").addEventListener("click", function () {
+    manager.reInit(snakes, snakeObjects);
     runOnLoad();
   });
 }
 
 const runOnLoad = function () {
   manager.gameBoard = gameBoard = new boardProps(totalRowBoxes);
-  snakes = manager.populate(gameBoard.canvas.length, snakeObjects, gameBoard);
-  for (let snake of snakes) { manager.spawnFood(snake); }
+  snakes = manager.populate(snakeObjects);
+  for (let snake of snakes) snake.spawnFood(manager.getRandomLocations(snake.bodies));
   
   gameBoard.startGame();
 }
