@@ -179,9 +179,7 @@ const aStar = {
       if (this.proto.isSameCoordinate(currentNode, food)) {
         console.log("PATH FOUND");
         let ret = [], curr = currentNode;
-        while (curr.parent) {
-          ret.push(curr = curr.parent);
-        }
+        while (curr.parent) ret.push(curr = curr.parent);
         // this.proto.colourize(ret.map(v => Object.assign({}, v)).reverse());
         return ret.map(v => delete v.parent ? v : v).reverse();
       }

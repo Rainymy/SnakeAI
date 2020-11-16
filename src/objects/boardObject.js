@@ -3,9 +3,7 @@ function boardProps(boxes) {
   this.canvas = document.getElementsByTagName('canvas');
   this.ctx = (() => {
     let ctx = [];
-    for (let context of this.canvas) {
-      ctx.push(context.getContext('2d'));
-    }
+    for (let context of this.canvas) ctx.push(context.getContext('2d'));
     return ctx;
   })();
   this.totalBoxes = Math.floor(boxes) || 10;
@@ -22,12 +20,8 @@ function boardProps(boxes) {
     }
     return this;
   }
-  this.runAgain = (index) => {
-    return update(this.loopIds[index]);
-  }
-  this.endGame = function (loopObj) {
-    return clearInterval(loopObj.intervalId);
-  }
+  this.runAgain = (index) => update(this.loopIds[index]);
+  this.endGame = (loopObj) => clearInterval(loopObj.intervalId);
   this.isGameEnded = function (bodies, loopObj) {
     for (let [ i, body ] of bodies.entries()) {
       // if head is outside of the box 
@@ -117,48 +111,38 @@ function boardProps(boxes) {
     context.getContext('2d').clearRect(0, 0, context.width, context.height);
   }
   this.clearPixel = (x, y, loopObj) => {
-    let context = this.canvas[loopObj.index];
-    context.getContext('2d').clearRect(x, y, this.boxPixel, this.boxPixel);
+    this.canvas[loopObj.index].getContext('2d').clearRect(x, y, this.boxPixel, this.boxPixel);
   }
   this.drawSolidRect = (x, y, index, colour) => {
-    let context = this.ctx[index];
-    context.beginPath();
-    context.fillStyle = colour || "black";
-    context.fillRect(x, y, this.boxPixel, this.boxPixel);
+    this.ctx[index].beginPath();
+    this.ctx[index].fillStyle = colour || "black";
+    this.ctx[index].fillRect(x, y, this.boxPixel, this.boxPixel);
   }
   this.drawFoods = (foods, loopObj) => {
-    for (let food of foods) {
-      this.drawSolidRect(food.x, food.y, loopObj.index, "green");
-    }
+    for (let food of foods) this.drawSolidRect(food.x, food.y, loopObj.index, "green");
   }
   this.character = (bodies, loopObj) => {
     this.drawSolidRect(bodies[0].x, bodies[0].y, loopObj.index, "red");
-  }
-  this.convertFromGridToPosition = (location) => {
-    return { x: location.row * this.boxPixel, y: location.column * this.boxPixel }
   }
   this.container = [];
   this.colourize = (position, visualize, speed) => {
     let location;
     if (position.hasOwnProperty("row")) {
-      location = this.convertFromGridToPosition(position);
+      location = { x: position.row * this.boxPixel, y: position.column * this.boxPixel }
     }
     this.container.push(location);
     if (visualize) {
       let id = setInterval(() => {
-        if (this.container.length <= 0) {
-          return clearInterval(id);
-        }
-        let curr = this.container.shift();
-        this.drawSolidRect(curr.x, curr.y, 0, "white");
+        if (this.container.length <= 0) return clearInterval(id);
+        let { x, y } = this.container.shift();
+        this.drawSolidRect(x, y, 0, "white");
       }, parseInt(speed) || 250);
     }
   }
   this.drawSqure = (x, y, index) => {
-    let context = this.ctx[index];
-    context.beginPath();
-    context.rect(x, y, this.boxPixel, this.boxPixel);
-    context.stroke();
+    this.ctx[index].beginPath();
+    this.ctx[index].rect(x, y, this.boxPixel, this.boxPixel);
+    this.ctx[index].stroke();
   };
   this.drawMap = (loopObj) => {
     for (let canvas of this.canvas) {

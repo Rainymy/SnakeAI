@@ -4,10 +4,10 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
   }
   this.getOpposite = function (direction) {
     if (typeof direction === undefined || direction == undefined) return [];
-    if (direction.letter === "w") return { x: 0, y: 1, letter: "s" };
-    if (direction.letter === "s") return { x: 0, y: -1, letter: "w" };
-    if (direction.letter === "a") return { x: 1, y: 0, letter: "d" };
-    if (direction.letter === "d") return { x: -1, y: 0, letter: "a" };
+    if (direction.letter === "w") return this.compass.up;
+    if (direction.letter === "s") return this.compass.down;
+    if (direction.letter === "a") return this.compass.right;
+    if (direction.letter === "d") return this.compass.left;
     return [];
   }
   this.getNextDirection = function () {
@@ -32,20 +32,18 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
     body[body.length - 1].invisible = true;
     
     return this.direction.x === 0 && this.direction.y === 0 
-    ? [{ x: -boxSize, y: -boxSize }] : [last]
+      ? [{ x: -boxSize, y: -boxSize }] : [last];
   }
   this.pressHandler = function (key) {
     let direction = this.direction;
-    if (key === "w" && direction !== "s") return { x: 0, y: -1, letter: "w" };
-    else if (key === "s" && direction !== "w") return { x: 0, y: 1, letter: "s" };
-    else if (key === "d" && direction !== "a") return { x: 1, y: 0, letter: "d" };
-    else if (key === "a" && direction !== "d") return { x: -1, y: 0, letter: "a" };
+    if (key === "w" && direction !== "s") return this.compass.up;
+    else if (key === "s" && direction !== "w") return this.compass.down;
+    else if (key === "d" && direction !== "a") return this.compass.right;
+    else if (key === "a" && direction !== "d") return this.compass.left;
     return null;
   }
   this.spawnFood = function (locations) {
-    for (let location of locations) {
-      this.foods.push({ x: location.x, y: location.y });
-    }
+    for (let location of locations) this.foods.push({ x: location.x, y: location.y });
   }
   this.getRandomColor = function () {
     return `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`;
@@ -58,19 +56,21 @@ function snakeObjects(boxSize, totalBoxes, canvas) {
   this.frames = 0;
   this.canvas = canvas;
   this.pressQueue = [];
+  this.compass = {
+    up:    { x: 0,  y: -1, letter: "w" },
+    down:  { x: 0,  y: 1,  letter: "s" },
+    right: { x: 1,  y: 0,  letter: "d" },
+    left:  { x: -1, y: 0,  letter: "a" }
+  };
   this.bodies = [
-    {
-      x: this.x, 
-      y: this.y,
-      invisible: false
-    },
-    {
-      x: this.x, 
-      y: this.y,
-      invisible: true
-    }
+    { x: this.x, y: this.y, invisible: false },
+    { x: this.x, y: this.y, invisible: true }
   ];
   this.foods = [];
-  this.lastDirection = {};
-  this.direction = { x: 0, y: 0, letter: null };
+  this.lastDirection = [];
+  this.direction = (() => {
+    // from start pick a random direction
+    let keys = Object.keys(this.compass);
+    return this.compass[keys[Math.floor(keys.length * Math.random())]];
+  })();
 }

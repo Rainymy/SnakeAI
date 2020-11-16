@@ -21,8 +21,8 @@
           </button>
           <div class="d-inline-block">
             <input type="search">
-            <button class="btn" onclick="changeTotalGame(this)">
-              <b>Change</b>
+            <button id="changeTotal" class="btn bold">
+              Change
             </button>
           </div>
         </div>
@@ -41,25 +41,44 @@
   <script defer src="./src/pathFinding.js" charset="utf-8"></script>
   <script defer src="./src/renderer.js" charset="utf-8"></script>
   <script defer type="text/javascript" charset="utf-8">
-  
-    function changeTotalGame(event) {
-      let number = Math.floor(parseInt(event.previousElementSibling.value));
-      if (!Number.isNaN(number) && 1 <= number) {
-        localStorage.setItem("totalCanvas", number);
-        location.reload();
-      }
+    
+    function runOnLoad() {
+      manager.gameBoard = gameBoard = new boardProps(totalRowBoxes);
+      snakes = manager.populate(snakeObjects);
+      for (let snake of snakes) snake.spawnFood(manager.getRandomLocations(snake.bodies));
+      
+      gameBoard.startGame();
     }
   
     // init when page done loading
     window.addEventListener("load", () => {
-      if (!localStorage.getItem("totalCanvas")) localStorage.setItem("totalCanvas", 4);
+      if (!localStorage.getItem("totalCanvas")) localStorage.setItem("totalCanvas", 1);
       
       manager = new boardManager();
       manager.createGameGround(
         document.querySelector(".gameDiv > div"), localStorage.totalCanvas
       );
       
-      eventHandlers();
+      document.body.addEventListener("keyup", function (event) {
+        if (event.key === "Escape") {
+          for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
+        }
+        else if (event.key === "§") aStar.search(currentSnake, manager.wholeMap);
+      });
+      
+      document.querySelector("#trying").addEventListener("click", function () {
+        manager.reInit(snakes, snakeObjects);
+        runOnLoad();
+      });
+      
+      document.querySelector("#changeTotal").addEventListener("click", function (event) {
+        let number = Math.floor(parseInt(event.target.previousElementSibling.value));
+        if (!Number.isNaN(number) && 1 <= number) {
+          localStorage.setItem("totalCanvas", number);
+          location.reload();
+        }
+      });
+      
       runOnLoad();
     }, { once: true });
   </script>

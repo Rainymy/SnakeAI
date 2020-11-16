@@ -39,24 +39,3 @@ function update(loopIndex) {
   
   currentSnake.direction = currentSnake.getNextDirection();
 }
-
-function eventHandlers() {
-  document.body.addEventListener("keyup", function (event) {
-    if (event.key === "Escape") {
-      for (let loop of gameBoard.loopIds) gameBoard.endGame(loop);
-    }
-    else if (event.key === "§") aStar.search(currentSnake, manager.wholeMap);
-  });
-  document.querySelector("#trying").addEventListener("click", function () {
-    manager.reInit(snakes, snakeObjects);
-    runOnLoad();
-  });
-}
-
-const runOnLoad = function () {
-  manager.gameBoard = gameBoard = new boardProps(totalRowBoxes);
-  snakes = manager.populate(snakeObjects);
-  for (let snake of snakes) snake.spawnFood(manager.getRandomLocations(snake.bodies));
-  
-  gameBoard.startGame();
-}

@@ -20,6 +20,9 @@ canvas {
   background-color: grey;
   margin: auto;
 }
+.bold {
+  font-weight: bold;
+}
 .score {
   position: absolute;
   bottom: 0;
